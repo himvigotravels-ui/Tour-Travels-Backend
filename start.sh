@@ -21,9 +21,14 @@ npx prisma generate
 echo "🔄 Pushing Prisma schema to SQLite database..."
 npx prisma db push --accept-data-loss
 
-# 3. Always re-seed if the marker is missing OR if the DB appears empty
-#    This ensures data is populated even after a persistent disk wipe.
+# 3. Seed logic
 SEED_MARKER="$DB_DIR/.seeded"
+
+# Allow force re-seed via environment variable (set FORCE_RESEED=true in Render dashboard)
+if [ "$FORCE_RESEED" = "true" ]; then
+  echo "🔄 FORCE_RESEED is set — removing seed marker to trigger fresh seed..."
+  rm -f "$SEED_MARKER"
+fi
 
 if [ ! -f "$SEED_MARKER" ]; then
   echo "🌱 Seeding SQLite database from backup JSON..."
@@ -33,7 +38,7 @@ if [ ! -f "$SEED_MARKER" ]; then
   echo "✅ SQLite database seeded and marker file created at $SEED_MARKER"
 else
   echo "ℹ️ Database already seeded (marker found at $SEED_MARKER). Skipping."
-  echo "   To force re-seed, delete $SEED_MARKER and restart."
+  echo "   To force re-seed, set env FORCE_RESEED=true and restart."
 fi
 
 # 4. Start the Express server
