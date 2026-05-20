@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 import "../src/db.js"; // initialise schema
 import { run } from "../src/query.js";
+import { DESTINATIONS as ENRICHED_DESTINATIONS, PACKAGES as REGION_PACKAGES } from "./seed_content.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -457,6 +458,27 @@ export async function seed() {
         },
       });
     }
+  }
+
+  // Enrichment pass: layer Himachal-region content on top of the
+  // backup-restored rows. Slugs match what's already indexed by search
+  // engines, so we overwrite content but never change the slug.
+  console.log(`🏔️  enriching ${ENRICHED_DESTINATIONS.length} destinations with Himachal content...`);
+  for (const d of ENRICHED_DESTINATIONS) {
+    run("destination", "upsert", {
+      where: { slug: d.slug },
+      update: d,
+      create: d,
+    });
+  }
+
+  console.log(`🎒 seeding ${REGION_PACKAGES.length} region-anchored packages...`);
+  for (const p of REGION_PACKAGES) {
+    run("package", "upsert", {
+      where: { slug: p.slug },
+      update: p,
+      create: p,
+    });
   }
 
   console.log("📑 nav groups (package + trek types)...");
