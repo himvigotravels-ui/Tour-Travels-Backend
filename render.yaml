@@ -2,10 +2,9 @@ services:
   - type: web
     name: tour-travels-backend
     runtime: node
-    repo: https://github.com/YOUR_USERNAME/YOUR_REPO_NAME # Set this to your repository URL
-    rootDir: server
+    repo: https://github.com/himvigotravels-ui/Tour-Travels-Backend.git
     buildCommand: npm install && npx prisma generate
-    startCommand: ./start.sh
+    startCommand: sh start.sh
     envVars:
       - key: PORT
         value: 3001
