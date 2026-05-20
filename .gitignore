@@ -1,0 +1,10 @@
+node_modules/
+.env
+dev.db
+dev.db-journal
+dev.db-shm
+dev.db-wal
+tour-travels.db
+*.db
+*.db-journal
+.DS_Store
