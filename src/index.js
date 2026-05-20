@@ -5,11 +5,30 @@ import { PrismaClient } from "@prisma/client";
 
 dotenv.config();
 
-// Ensure DATABASE_URL is always set — falls back to local prisma dir
-// start.sh will override this to /var/data/tour-travels.db when a persistent disk is available
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = "file:./prisma/dev.db";
+// Safe DATABASE_URL resolution:
+// If DATABASE_URL points to /var/data but that path is not writable (Render free tier),
+// fall back to ./prisma/dev.db which always works.
+import { existsSync, mkdirSync, accessSync, constants } from "fs";
+
+function resolveDbUrl() {
+  const url = process.env.DATABASE_URL || "file:./prisma/dev.db";
+  // Check if it points to /var/data
+  if (url.startsWith("file:/var/data")) {
+    try {
+      mkdirSync("/var/data", { recursive: true });
+      accessSync("/var/data", constants.W_OK);
+      console.log("📂 /var/data is writable — using persistent disk DB");
+      return url;
+    } catch {
+      console.log("⚠️  /var/data not writable (no persistent disk) — falling back to ./prisma/dev.db");
+      return "file:./prisma/dev.db";
+    }
+  }
+  return url;
 }
+
+process.env.DATABASE_URL = resolveDbUrl();
+console.log("📦 Active DATABASE_URL:", process.env.DATABASE_URL);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
