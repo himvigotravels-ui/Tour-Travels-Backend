@@ -15,56 +15,33 @@ const u = (id) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
 
 const IMG = {
-  // ── Destinations ──────────────────────────────────────────────────
-  // Manali — Beas valley, snow peaks
-  manali: u("photo-1626621331169-5f34be280ed9"),
-  // Shimla — colonial hill station, deodar slopes
-  shimla: u("photo-1626248801379-51a0748a5f96"),
-  // Spiti — cold-desert valley, ochre cliffs
-  spiti: u("photo-1591018653688-4d8a31fa42e2"),
-  // Kasol — Parvati Valley pine forest
-  kasol: u("photo-1593115057322-e94b77572f20"),
-  // Dharamshala — Dhauladhar range from McLeod Ganj
-  dharamshala: u("photo-1561361398-a8d3aaae9e6e"),
-  // Kinnaur — Kinner Kailash range
-  kinnaur: u("photo-1542401886-65d6c61db217"),
-  // Dalhousie — colonial deodar town
-  dalhousie: u("photo-1502082553048-f009c37129b9"),
-  // Kalpa — apple-orchard village
-  kalpa: u("photo-1568702846914-96b305d2aaeb"),
-  // Sangla / Baspa river valley
-  sangla: u("photo-1464822759023-fed622ff2c3b"),
-  // Chitkul — last Indian village, river bend
-  chitkul: u("photo-1542401886-65d6c61db217"),
-  // Pathankot / Amritsar — Golden Temple, gateway towns
-  pathankot: u("photo-1587135304313-bf18877af00a"),
-  amritsar: u("photo-1587135304313-bf18877af00a"),
-  // Leh-Ladakh — Pangong / high-altitude scene
-  ladakh: u("photo-1589793463357-5fa44b2f6c44"),
+  // ── Destinations (all IDs verified to resolve 200 on Unsplash) ────
+  manali:      u("photo-1626621331169-5f34be280ed9"), // Spiti-style mountain
+  shimla:      u("photo-1626248801379-51a0748a5f96"), // misty hill town
+  spiti:       u("photo-1473625247510-8ceb1760943f"), // monastery / Tibet
+  kasol:       u("photo-1593115057322-e94b77572f20"), // pine forest valley
+  dharamshala: u("photo-1544735716-392fe2489ffa"),   // Triund meadow ridge
+  kinnaur:     u("photo-1542401886-65d6c61db217"),   // Kinner range
+  dalhousie:   u("photo-1502082553048-f009c37129b9"), // alpine meadow
+  kalpa:       u("photo-1568702846914-96b305d2aaeb"), // apple orchard
+  sangla:      u("photo-1464822759023-fed622ff2c3b"), // river valley
+  chitkul:     u("photo-1542401886-65d6c61db217"),   // mountain village
+  pathankot:   u("photo-1518998053901-5348d3961a04"), // train / journey
+  amritsar:    u("photo-1518998053901-5348d3961a04"), // journey
+  ladakh:      u("photo-1454496522488-7a8e488e8606"), // high mountain road
 
-  // ── Activities & hero scenes ──────────────────────────────────────
-  // Solang — snow point, skiing
-  solang: u("photo-1551524559-8af4e6624178"),
-  // The Ridge / colonial Shimla
-  ridge: u("photo-1626248801379-51a0748a5f96"),
-  // Monastery — Key/Tabo style
-  monastery: u("photo-1473625247510-8ceb1760943f"),
-  // Parvati — Kheerganga / hot springs
-  parvati: u("photo-1464822759023-fed622ff2c3b"),
-  // Triund — Dhauladhar meadow trek
-  triund: u("photo-1544735716-392fe2489ffa"),
-  // Paragliding — Bir Billing
-  paragliding: u("photo-1473444330585-93a48b18ba79"),
-  // Apple orchard — Kinnaur autumn
-  apple: u("photo-1568702846914-96b305d2aaeb"),
-  // Khajjiar — alpine meadow
-  khajjiar: u("photo-1502082553048-f009c37129b9"),
-  // High-altitude mountain road (Manali-Leh)
-  road: u("photo-1454496522488-7a8e488e8606"),
-  // Camping under stars (Chandratal, Triund, Sarchu)
-  camp: u("photo-1504280390367-361c6d9f38f4"),
-  // Tempo Traveller / mountain vehicle
-  tempo: u("photo-1544620347-c4fd4a3d5957"),
+  // ── Activities & hero scenes (verified 200) ───────────────────────
+  solang:      u("photo-1551524559-8af4e6624178"),   // snow / ski
+  ridge:       u("photo-1626248801379-51a0748a5f96"), // Shimla scene
+  monastery:   u("photo-1473625247510-8ceb1760943f"), // monastery
+  parvati:     u("photo-1464822759023-fed622ff2c3b"), // river valley
+  triund:      u("photo-1544735716-392fe2489ffa"),   // Triund meadow
+  paragliding: u("photo-1614977645540-7abd88ba8e56"), // mountain panorama
+  apple:       u("photo-1568702846914-96b305d2aaeb"), // apple orchard
+  khajjiar:    u("photo-1502082553048-f009c37129b9"), // meadow
+  road:        u("photo-1454496522488-7a8e488e8606"), // high road
+  camp:        u("photo-1504280390367-361c6d9f38f4"), // camping
+  tempo:       u("photo-1544620347-c4fd4a3d5957"),   // travel vehicle
 };
 
 // ─── Enriched destinations ─────────────────────────────────────────────
