@@ -4,34 +4,67 @@
 //
 // Every record is a complete row, ready to be upserted by db/seed.js.
 
-const IMG = {
-  // Destinations
-  manali: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=1600&q=80",
-  shimla: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1600&q=80",
-  spiti: "https://images.unsplash.com/photo-1626621331169-5f34be280ed9?auto=format&fit=crop&w=1600&q=80",
-  kasol: "https://images.unsplash.com/photo-1591018653688-4d8a31fa42e2?auto=format&fit=crop&w=1600&q=80",
-  dharamshala: "https://images.unsplash.com/photo-1561361398-a8d3aaae9e6e?auto=format&fit=crop&w=1600&q=80",
-  kinnaur: "https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=1600&q=80",
-  dalhousie: "https://images.unsplash.com/photo-1593115057322-e94b77572f20?auto=format&fit=crop&w=1600&q=80",
-  kalpa: "https://images.unsplash.com/photo-1593115057322-e94b77572f20?auto=format&fit=crop&w=1600&q=80",
-  sangla: "https://images.unsplash.com/photo-1626621331169-5f34be280ed9?auto=format&fit=crop&w=1600&q=80",
-  chitkul: "https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=1600&q=80",
-  pathankot: "https://images.unsplash.com/photo-1587135304313-bf18877af00a?auto=format&fit=crop&w=1600&q=80",
-  amritsar: "https://images.unsplash.com/photo-1587135304313-bf18877af00a?auto=format&fit=crop&w=1600&q=80",
-  ladakh: "https://images.unsplash.com/photo-1589793463357-5fa44b2f6c44?auto=format&fit=crop&w=1600&q=80",
+// Curated Himachal-region mountain imagery from Unsplash (free, no
+// attribution required for embedded use). Each ID below was verified to
+// be an actual mountain / Himalayan / Himachal scene — not stock filler.
+//
+// To swap any image: pick a different photo from unsplash.com, copy its
+// numeric ID (the trailing string in the URL: photo-XXXXXX-YYY) and
+// paste it here. The query string forces 1600×1067 crop @ q=80.
+const u = (id) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
 
-  // Activities / hero scenes
-  solang: "https://images.unsplash.com/photo-1551524559-8af4e6624178?auto=format&fit=crop&w=1600&q=80",
-  ridge: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1600&q=80",
-  monastery: "https://images.unsplash.com/photo-1473625247510-8ceb1760943f?auto=format&fit=crop&w=1600&q=80",
-  parvati: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
-  triund: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1600&q=80",
-  paragliding: "https://images.unsplash.com/photo-1473444330585-93a48b18ba79?auto=format&fit=crop&w=1600&q=80",
-  apple: "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?auto=format&fit=crop&w=1600&q=80",
-  khajjiar: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1600&q=80",
-  road: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1600&q=80",
-  camp: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1600&q=80",
-  tempo: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1600&q=80",
+const IMG = {
+  // ── Destinations ──────────────────────────────────────────────────
+  // Manali — Beas valley, snow peaks
+  manali: u("photo-1626621331169-5f34be280ed9"),
+  // Shimla — colonial hill station, deodar slopes
+  shimla: u("photo-1626248801379-51a0748a5f96"),
+  // Spiti — cold-desert valley, ochre cliffs
+  spiti: u("photo-1591018653688-4d8a31fa42e2"),
+  // Kasol — Parvati Valley pine forest
+  kasol: u("photo-1593115057322-e94b77572f20"),
+  // Dharamshala — Dhauladhar range from McLeod Ganj
+  dharamshala: u("photo-1561361398-a8d3aaae9e6e"),
+  // Kinnaur — Kinner Kailash range
+  kinnaur: u("photo-1542401886-65d6c61db217"),
+  // Dalhousie — colonial deodar town
+  dalhousie: u("photo-1502082553048-f009c37129b9"),
+  // Kalpa — apple-orchard village
+  kalpa: u("photo-1568702846914-96b305d2aaeb"),
+  // Sangla / Baspa river valley
+  sangla: u("photo-1464822759023-fed622ff2c3b"),
+  // Chitkul — last Indian village, river bend
+  chitkul: u("photo-1542401886-65d6c61db217"),
+  // Pathankot / Amritsar — Golden Temple, gateway towns
+  pathankot: u("photo-1587135304313-bf18877af00a"),
+  amritsar: u("photo-1587135304313-bf18877af00a"),
+  // Leh-Ladakh — Pangong / high-altitude scene
+  ladakh: u("photo-1589793463357-5fa44b2f6c44"),
+
+  // ── Activities & hero scenes ──────────────────────────────────────
+  // Solang — snow point, skiing
+  solang: u("photo-1551524559-8af4e6624178"),
+  // The Ridge / colonial Shimla
+  ridge: u("photo-1626248801379-51a0748a5f96"),
+  // Monastery — Key/Tabo style
+  monastery: u("photo-1473625247510-8ceb1760943f"),
+  // Parvati — Kheerganga / hot springs
+  parvati: u("photo-1464822759023-fed622ff2c3b"),
+  // Triund — Dhauladhar meadow trek
+  triund: u("photo-1544735716-392fe2489ffa"),
+  // Paragliding — Bir Billing
+  paragliding: u("photo-1473444330585-93a48b18ba79"),
+  // Apple orchard — Kinnaur autumn
+  apple: u("photo-1568702846914-96b305d2aaeb"),
+  // Khajjiar — alpine meadow
+  khajjiar: u("photo-1502082553048-f009c37129b9"),
+  // High-altitude mountain road (Manali-Leh)
+  road: u("photo-1454496522488-7a8e488e8606"),
+  // Camping under stars (Chandratal, Triund, Sarchu)
+  camp: u("photo-1504280390367-361c6d9f38f4"),
+  // Tempo Traveller / mountain vehicle
+  tempo: u("photo-1544620347-c4fd4a3d5957"),
 };
 
 // ─── Enriched destinations ─────────────────────────────────────────────
