@@ -5,30 +5,16 @@ import { PrismaClient } from "@prisma/client";
 
 dotenv.config();
 
-// Safe DATABASE_URL resolution:
-// If DATABASE_URL points to /var/data but that path is not writable (Render free tier),
-// fall back to ./prisma/dev.db which always works.
-import { existsSync, mkdirSync, accessSync, constants } from "fs";
-
-function resolveDbUrl() {
-  const url = process.env.DATABASE_URL || "file:./prisma/dev.db";
-  // Check if it points to /var/data
-  if (url.startsWith("file:/var/data")) {
-    try {
-      mkdirSync("/var/data", { recursive: true });
-      accessSync("/var/data", constants.W_OK);
-      console.log("📂 /var/data is writable — using persistent disk DB");
-      return url;
-    } catch {
-      console.log("⚠️  /var/data not writable (no persistent disk) — falling back to ./prisma/dev.db");
-      return "file:./prisma/dev.db";
-    }
-  }
-  return url;
+// SQLite lives in the project's prisma/ dir (./prisma/dev.db). Render's
+// app filesystem is writable for the lifetime of the instance, which is
+// enough here. If DATABASE_URL is unset (local dev) we default to the
+// same path. We intentionally do NOT try /var/data — that path is only
+// available on Render with a paid persistent disk.
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = "file:./prisma/dev.db";
 }
-
-process.env.DATABASE_URL = resolveDbUrl();
 console.log("📦 Active DATABASE_URL:", process.env.DATABASE_URL);
+console.log("📂 CWD:", process.cwd());
 
 const app = express();
 const PORT = process.env.PORT || 3001;

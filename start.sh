@@ -1,21 +1,15 @@
 #!/bin/sh
 set -e
 
-# Determine database path:
-# 1. If /var/data exists and is writable (Render persistent disk), use it
-# 2. Otherwise, use the local prisma directory
-if mkdir -p /var/data 2>/dev/null && touch /var/data/.write_test 2>/dev/null; then
-  rm -f /var/data/.write_test
-  export DATABASE_URL="file:/var/data/tour-travels.db"
-  DB_DIR="/var/data"
-  echo "📂 Using Render persistent disk at /var/data"
-else
-  export DATABASE_URL="file:./prisma/dev.db"
-  DB_DIR="./prisma"
-  echo "📂 Using local prisma directory (no persistent disk)"
-fi
+# DB lives in the project's prisma/ dir. Render's app filesystem is
+# writable for the instance lifetime, which is enough for this app (admin
+# edits persist until the next redeploy/restart). A persistent disk can
+# be added later if needed.
+export DATABASE_URL="file:./prisma/dev.db"
+DB_DIR="./prisma"
 
 echo "📦 DATABASE_URL = $DATABASE_URL"
+echo "📂 CWD = $(pwd)"
 
 # 1. Generate Prisma Client
 echo "⚙️ Generating Prisma Client..."

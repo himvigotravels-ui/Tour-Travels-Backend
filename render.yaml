@@ -10,5 +10,8 @@ services:
         value: 3001
       - key: API_SECRET_KEY
         value: himvigo-super-secret-key-2026
+      # SQLite file lives in the project's prisma/ dir. Ephemeral on
+      # Render free tier (resets on redeploy) — fine for this app
+      # because start.sh re-seeds whenever the .seeded marker is absent.
       - key: DATABASE_URL
         value: file:./prisma/dev.db
