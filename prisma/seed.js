@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const prisma = new PrismaClient();
-const backupPath = path.resolve(__dirname, "../../backups/db_backup_2026-04-27T18-21-02-743Z.json");
+const backupPath = path.resolve(__dirname, "./db_backup_2026-04-27T18-21-02-743Z.json");
 
 async function seed() {
   console.log(`📂 Reading backup file from: ${backupPath}`);

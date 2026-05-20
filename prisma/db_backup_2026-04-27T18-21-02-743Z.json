@@ -1,0 +1,1151 @@
+{
+  "_prisma_migrations": [
+    {
+      "id": "e2cd54d8-a291-43e0-8dc4-ef1fb00dbed5",
+      "checksum": "7428cadc73a8acd50149d7d042da09057395bc5f11b3213ff9080b05a4efde18",
+      "finished_at": "2026-04-20T18:34:58.885Z",
+      "migration_name": "20260420183451_init",
+      "logs": null,
+      "rolled_back_at": null,
+      "started_at": "2026-04-20T18:34:53.023Z",
+      "applied_steps_count": 1
+    }
+  ],
+  "packages": [
+    {
+      "id": "cmo7md5ns00090qpznbo3qzoe",
+      "slug": "shimla-manali-delight",
+      "title": "Shimla Manali Family Delight",
+      "location": "Shimla & Manali",
+      "pricePerPerson": 16500,
+      "durationDays": 6,
+      "durationNights": 5,
+      "imageUrls": [
+        "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?auto=format&fit=crop&q=80&w=800",
+        "https://images.unsplash.com/photo-1605649487212-4d4ce3e01ce4?auto=format&fit=crop&q=80&w=800"
+      ],
+      "vehicleType": "Sedan",
+      "maxOccupancy": 4,
+      "description": "The classic Himachal tour covering the colonial charm of Shimla and the scenic beauty of Manali.",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Shimla Arrival",
+          "activities": "Check-in. Evening at Mall Road."
+        },
+        {
+          "day": 2,
+          "title": "Kufri Sightseeing",
+          "activities": "Visit Kufri, Jakhu Temple."
+        },
+        {
+          "day": 3,
+          "title": "Drive to Manali",
+          "activities": "Scenic drive via Kullu Valley."
+        },
+        {
+          "day": 4,
+          "title": "Solang Valley",
+          "activities": "Snow activities."
+        },
+        {
+          "day": 5,
+          "title": "Manali Local",
+          "activities": "Hadimba Temple, Club House."
+        },
+        {
+          "day": 6,
+          "title": "Departure",
+          "activities": "Drop at Chandigarh/Delhi."
+        }
+      ],
+      "inclusions": [
+        "Private Sedan",
+        "3 Star Hotels",
+        "Breakfast & Dinner"
+      ],
+      "exclusions": [
+        "Lunch",
+        "Activity fees",
+        "Monument entry"
+      ],
+      "categories": [
+        "family",
+        "leisure"
+      ],
+      "isFeatured": true,
+      "isActive": true,
+      "metaTitle": null,
+      "metaDescription": null,
+      "metaKeywords": null,
+      "createdAt": "2026-04-20T14:30:14.824Z",
+      "updatedAt": "2026-04-20T14:30:14.824Z"
+    },
+    {
+      "id": "cmo7jumxf0001l0pzjy0hvwwx",
+      "slug": "spiti-valley-expedition",
+      "title": "Spiti Valley Road Trip",
+      "location": "Spiti Valley",
+      "pricePerPerson": 14999,
+      "durationDays": 7,
+      "durationNights": 6,
+      "imageUrls": [
+        "/images/destinations/spiti.png"
+      ],
+      "vehicleType": "Tempo Traveller",
+      "maxOccupancy": 12,
+      "description": "Embark on an unforgettable journey through the rugged terrains of Spiti.",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Arrival in Shimla",
+          "activities": "Pickup from Shimla."
+        }
+      ],
+      "inclusions": [
+        "Transport",
+        "Accommodation"
+      ],
+      "exclusions": [
+        "Lunch",
+        "Entry fees"
+      ],
+      "categories": [
+        "adventure"
+      ],
+      "isFeatured": true,
+      "isActive": true,
+      "metaTitle": null,
+      "metaDescription": null,
+      "metaKeywords": null,
+      "createdAt": "2026-04-20T13:19:51.507Z",
+      "updatedAt": "2026-04-20T14:35:39.016Z"
+    },
+    {
+      "id": "cmo7jun690002l0pznxkp0nna",
+      "slug": "manali-snow-retreat",
+      "title": "Manali Premium Snow Retreat",
+      "location": "Manali",
+      "pricePerPerson": 8999,
+      "durationDays": 4,
+      "durationNights": 3,
+      "imageUrls": [
+        "/images/destinations/manali.png"
+      ],
+      "vehicleType": "Innova Crysta",
+      "maxOccupancy": 6,
+      "description": "A perfect short getaway to the Valley of the Gods.",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Arrival in Manali",
+          "activities": "Check-in."
+        }
+      ],
+      "inclusions": [
+        "Private Innova",
+        "Resort"
+      ],
+      "exclusions": [
+        "Activity charges"
+      ],
+      "categories": [
+        "family",
+        "honeymoon"
+      ],
+      "isFeatured": true,
+      "isActive": true,
+      "metaTitle": null,
+      "metaDescription": null,
+      "metaKeywords": null,
+      "createdAt": "2026-04-20T13:19:51.825Z",
+      "updatedAt": "2026-04-20T14:35:39.306Z"
+    },
+    {
+      "id": "cmo7juneq0003l0pz99u7mjd7",
+      "slug": "kasol-kheerganga-trek",
+      "title": "Kasol & Kheerganga Backpacking",
+      "location": "Kasol",
+      "pricePerPerson": 6499,
+      "durationDays": 4,
+      "durationNights": 3,
+      "imageUrls": [
+        "/images/destinations/kasol.png"
+      ],
+      "vehicleType": "Tempo Traveller",
+      "maxOccupancy": 12,
+      "description": "Experience the hippie culture of Kasol.",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Arrival in Kasol",
+          "activities": "Explore cafes."
+        }
+      ],
+      "inclusions": [
+        "Camps",
+        "Meals"
+      ],
+      "exclusions": [
+        "Lunch"
+      ],
+      "categories": [
+        "adventure"
+      ],
+      "isFeatured": true,
+      "isActive": true,
+      "metaTitle": null,
+      "metaDescription": null,
+      "metaKeywords": null,
+      "createdAt": "2026-04-20T13:19:52.130Z",
+      "updatedAt": "2026-04-20T14:35:39.596Z"
+    },
+    {
+      "id": "cmo7mk4hc00093fpz92sp03gr",
+      "slug": "custom-kinnaur-tour",
+      "title": "Custom Kinnaur Tour",
+      "location": "Kinnaur",
+      "pricePerPerson": 12500,
+      "durationDays": 5,
+      "durationNights": 4,
+      "imageUrls": [
+        "/images/destinations/kinnaur.png"
+      ],
+      "vehicleType": "SUV",
+      "maxOccupancy": 6,
+      "description": "Explore the offbeat tracks of Kinnaur.",
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Shimla to Kalpa",
+          "activities": "Drive to Kalpa."
+        }
+      ],
+      "inclusions": [
+        "Transport",
+        "Meals"
+      ],
+      "exclusions": [
+        "Personal expenses"
+      ],
+      "categories": [
+        "offbeat"
+      ],
+      "isFeatured": true,
+      "isActive": true,
+      "metaTitle": null,
+      "metaDescription": null,
+      "metaKeywords": null,
+      "createdAt": "2026-04-20T14:35:39.888Z",
+      "updatedAt": "2026-04-20T14:35:39.888Z"
+    }
+  ],
+  "blogs": [
+    {
+      "id": "cmo7mdczd000p0qpzxw1x0zor",
+      "slug": "what-to-pack-for-kheerganga",
+      "title": "What to Pack for Kheerganga Trek",
+      "excerpt": "A complete packing checklist for your backpacking trip to Kheerganga.",
+      "content": "# Packing for Kheerganga\n\nTrekking to Kheerganga requires some preparation. Here is what you must pack:\n\n- **Trekking Shoes**: With good grip.\n- **Warm Clothes**: Temperatures drop at night.\n- **Water Bottle**: Stay hydrated during the trek.\n- **First Aid Kit**: Basic medicines and band-aids.\n- **Swimwear**: If you plan to take a dip in the hot springs.",
+      "author": "Simran Kaur",
+      "coverImage": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80",
+      "category": "Trekking Guide",
+      "tags": null,
+      "isPublished": true,
+      "publishedAt": "2026-04-17T18:30:00.000Z",
+      "metaTitle": null,
+      "metaDescription": null,
+      "metaKeywords": null,
+      "createdAt": "2026-04-20T14:30:24.313Z",
+      "updatedAt": "2026-04-20T14:30:24.313Z"
+    },
+    {
+      "id": "cmo7jupjh000al0pzhgumkw0r",
+      "slug": "hidden-gems-spiti",
+      "title": "10 Hidden Gems in Spiti Valley",
+      "excerpt": "Secret villages most tourists miss.",
+      "content": "# Hidden Gems of Spiti\n\nDiscover.",
+      "author": "Aditi Negi",
+      "coverImage": "https://images.unsplash.com/photo-1581791534721-e599df4417f7?auto=format&fit=crop&w=800&q=80",
+      "category": "Travel Guide",
+      "tags": null,
+      "isPublished": true,
+      "publishedAt": "2026-04-09T18:30:00.000Z",
+      "metaTitle": null,
+      "metaDescription": null,
+      "metaKeywords": null,
+      "createdAt": "2026-04-20T13:19:54.893Z",
+      "updatedAt": "2026-04-20T14:35:46.999Z"
+    }
+  ],
+  "destinations": [
+    {
+      "id": "cmo7junn80004l0pzn4jer4mh",
+      "slug": "spiti-valley",
+      "name": "Spiti Valley",
+      "tagline": "The Middle Land",
+      "description": "Raw, remote, and stunningly beautiful. Spiti's high-altitude desert landscape, ancient monasteries, and star-filled skies reward those willing to make the journey.",
+      "bestTime": "May to October",
+      "altitude": "12,500 ft",
+      "vibe": "Adventure & Spiritual",
+      "image": "/images/destinations/spiti.png",
+      "highlights": [
+        "Kinnaur Valley, Apple Orchards, Sutlej River views",
+        "Nako Village, Tabo Monastery, Spiti River",
+        "Key Monastery, Kibber Village, Hikkim (Highest Post Office), Langza Village",
+        "Chicham Bridge(Asia's highest bridge), Kunzum Pass, Chandratal Lake, Camping Experience",
+        "Atal Tunnel"
+      ],
+      "isActive": true,
+      "sortOrder": 1,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-20T13:19:52.436Z",
+      "updatedAt": "2026-04-22T12:41:09.491Z"
+    },
+    {
+      "id": "cmo7junvs0005l0pzjm9s9j7a",
+      "slug": "manali",
+      "name": "Manali",
+      "tagline": "Valley of the Gods",
+      "description": "Snow-capped peaks, pine forests, and adventure around every corner. Manali draws honeymooners, backpackers, and families alike with its perfect mix of natural beauty and accessible thrills—from Solang Valley paragliding to quiet walks along the Beas River.",
+      "bestTime": "Oct to June",
+      "altitude": "6,726 ft",
+      "vibe": "Romantic & Leisure",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1776792537/himvigo/destinations/jacpkkzkuciyyjflxt8j.jpg",
+      "highlights": [
+        "Visit Mall Road, Visit Hadimba Temple",
+        "Solang Valley, Atal Tunnel, Adventure activities, Snow point (seasonal)",
+        "Kullu Valley, River rafting point, Paragliding point, Manikaran Sahib, Kasol markets"
+      ],
+      "isActive": true,
+      "sortOrder": 2,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-20T13:19:52.744Z",
+      "updatedAt": "2026-04-22T12:41:05.501Z"
+    },
+    {
+      "id": "cmo7md4mi00050qpzfll54dmq",
+      "slug": "dharamshala",
+      "name": "Dharamshala",
+      "tagline": "Little Lhasa",
+      "description": "Home to the Dalai Lama and a vibrant Tibetan community. Come for the monasteries, stay for the mountain trails, cafes, and the genuine sense of peace that settles over you here.",
+      "bestTime": "Feb to June",
+      "altitude": "4,780 ft",
+      "vibe": "Spiritual & Nature",
+      "image": "/images/destinations/dharamshala.png",
+      "highlights": [
+        "Visit Dal Lake, Visit Naddi View Point",
+        "Dalai Lama Temple, Bhagsu Nag Temple, Bhagsu Waterfall, St. John Church, Local Market",
+        "Kangra Tea Gardens, Chamunda Devi Temple, HPCA Cricket Stadium, War Memorial"
+      ],
+      "isActive": true,
+      "sortOrder": 5,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-20T14:30:13.482Z",
+      "updatedAt": "2026-04-22T12:41:07.444Z"
+    },
+    {
+      "id": "cmo7juobz0007l0pz8mt9wu2h",
+      "slug": "shimla",
+      "name": "Shimla",
+      "tagline": "Queen of Hills",
+      "description": "The former summer capital of British India retains its colonial charm through heritage architecture, bustling Mall Road, and panoramic Himalayan views. A great starting point for first-time visitors to the hills.",
+      "bestTime": "March to June",
+      "altitude": "7,467 ft",
+      "vibe": "Heritage & Family",
+      "image": "/images/destinations/shimla.png",
+      "highlights": [
+        "The Ridge",
+        "Mall Road"
+      ],
+      "isActive": true,
+      "sortOrder": 4,
+      "metaTitle": null,
+      "metaDescription": null,
+      "metaKeywords": null,
+      "createdAt": "2026-04-20T13:19:53.327Z",
+      "updatedAt": "2026-04-22T12:41:06.421Z"
+    },
+    {
+      "id": "cmo7juo400006l0pz4kp6otw1",
+      "slug": "kasol",
+      "name": "Kasol",
+      "tagline": "Mini Israel of India",
+      "description": "A backpacker favorite tucked in the Parvati Valley. Known for its Israeli cafes, riverside campsites, and access to treks like Kheerganga and Tosh.",
+      "bestTime": "March to June",
+      "altitude": "5,180 ft",
+      "vibe": "Backpacking & Nature",
+      "image": "/images/destinations/kasol.png",
+      "highlights": [
+        "Parvati River Riverside Walk",
+        "Manikaran Sahib Gurudwara & Hot Springs",
+        "Chalal Village Nature Walk / Trek",
+        "Tosh Village Exploration",
+        "Kasol Café Culture & Local Market"
+      ],
+      "isActive": true,
+      "sortOrder": 3,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-20T13:19:53.040Z",
+      "updatedAt": "2026-04-22T12:41:08.469Z"
+    },
+    {
+      "id": "cmofkqz1h000304lb2xbjwpqd",
+      "slug": "sangla",
+      "name": "Sangla",
+      "tagline": "The Jewel of Baspa Valley",
+      "description": "Sangla is a charming valley surrounded by snow-capped mountains and lush greenery. It is famous for its scenic beauty, wooden houses, and adventure activities, making it a favorite destination for nature lovers.",
+      "bestTime": "April to October",
+      "altitude": "8,900 ft",
+      "vibe": "Nature & Adventure",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777196806/himvigo/destinations/vuocgurkuduk72glahfc.png",
+      "highlights": [
+        "Baspa River",
+        "Sangla Valley",
+        "Kamru Fort",
+        "Rakcham Village",
+        "Apple Orchards"
+      ],
+      "isActive": true,
+      "sortOrder": 0,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-26T04:07:09.605Z",
+      "updatedAt": "2026-04-26T04:07:09.605Z"
+    },
+    {
+      "id": "cmofkooxs000204lb118dwk3o",
+      "slug": "kalpa",
+      "name": "Kalpa",
+      "tagline": "Gateway to Kinnaur Kailash",
+      "description": "Kalpa is a scenic mountain village offering panoramic views of the Kinnaur Kailash range. It is known for its peaceful environment, apple orchards, and stunning sunrise and sunset views over the Himalayas.",
+      "bestTime": "April to October",
+      "altitude": "9,711 ft",
+      "vibe": "Peaceful & Scenic",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777196896/himvigo/destinations/cbk9fcd2n7xrlmecy8xg.png",
+      "highlights": [
+        "Kinnaur Kailash View",
+        "Suicide Point",
+        "Roghi Village",
+        "Apple Orchards",
+        "Kalpa Monastery"
+      ],
+      "isActive": true,
+      "sortOrder": 0,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-26T04:05:23.200Z",
+      "updatedAt": "2026-04-26T04:05:23.200Z"
+    },
+    {
+      "id": "cmofkmciu000104lbvhq4g708",
+      "slug": "kinnaur",
+      "name": "Kinnaur",
+      "tagline": "Land of Apples and Mountains",
+      "description": "Kinnaur is a beautiful Himalayan region famous for its apple orchards, rivers, and snow-covered peaks. It offers a unique blend of culture, adventure, and breathtaking landscapes, making it ideal for road trips and nature exploration.",
+      "bestTime": "April to October",
+      "altitude": "9,800 ft",
+      "vibe": "Adventure & Scenic Drives",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777196983/himvigo/destinations/ukxqw0bhosavndjhc0to.png",
+      "highlights": [
+        "Sangla Valley",
+        "Kalpa Village",
+        "Kinnaur Kailash View",
+        "Apple Orchards",
+        "Baspa River"
+      ],
+      "isActive": true,
+      "sortOrder": 1,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-26T04:03:33.798Z",
+      "updatedAt": "2026-04-26T04:03:33.798Z"
+    },
+    {
+      "id": "cmofkyoj0000604lb5t6at717",
+      "slug": "leh-ladakh",
+      "name": "Leh & Ladakh",
+      "tagline": "The Land of High Passes",
+      "description": "Leh and Ladakh are among the most adventurous travel destinations in India, known for their dramatic landscapes, monasteries, and high-altitude passes. It is perfect for road trips, biking adventures, and nature exploration.",
+      "bestTime": "May to September",
+      "altitude": "11,562 ft",
+      "vibe": "Adventure & Exploration",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777197083/himvigo/destinations/vixgkr6fo6v8dewf1e78.png",
+      "highlights": [
+        "Pangong Lake",
+        "Nubra Valley",
+        "Khardung La Pass",
+        "Magnetic Hill",
+        "Shanti Stupa"
+      ],
+      "isActive": true,
+      "sortOrder": 0,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-26T04:13:09.228Z",
+      "updatedAt": "2026-04-26T04:13:09.228Z"
+    },
+    {
+      "id": "cmofkti2u000404lbo5n44e65",
+      "slug": "amritsar",
+      "name": "Amritsar",
+      "tagline": "The Spiritual Heart of Punjab",
+      "description": "Amritsar is a vibrant city known for its rich culture, history, and spiritual significance. It is home to the famous Golden Temple and offers a unique blend of tradition, food, and heritage experiences.",
+      "bestTime": "October to March",
+      "altitude": "768 ft",
+      "vibe": "Spiritual & Cultural",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777197195/himvigo/destinations/xxsfbe6bcpqonylbkown.png",
+      "highlights": [
+        "Golden Temple",
+        "Jallianwala Bagh",
+        "Wagah Border Ceremony",
+        "Durgiana Temple",
+        "Local Food & Markets"
+      ],
+      "isActive": true,
+      "sortOrder": 1,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-26T04:09:07.590Z",
+      "updatedAt": "2026-04-26T04:09:07.590Z"
+    },
+    {
+      "id": "cmofkvwus000504lbbnljur2g",
+      "slug": "pathankot",
+      "name": "Pathankot",
+      "tagline": "Gateway to Himachal Pradesh",
+      "description": "Pathankot is an important transit city connecting Punjab to Himachal Pradesh and Jammu & Kashmir. It serves as a major gateway for travelers heading to hill stations and pilgrimage destinations.",
+      "bestTime": "October to March",
+      "altitude": "1,083 ft",
+      "vibe": "Transit & Short Stay",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777197294/himvigo/destinations/uyxfop1yaazcxxf1o3vb.png",
+      "highlights": [
+        "Ranjit Sagar Dam",
+        "Mukteshwar Temple",
+        "Nurpur Fort",
+        "Kathgarh Temple"
+      ],
+      "isActive": true,
+      "sortOrder": 1,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-26T04:11:00.052Z",
+      "updatedAt": "2026-04-26T04:11:00.052Z"
+    },
+    {
+      "id": "cmofkj9dz000004lb6o1ibuiw",
+      "slug": "dalhousie",
+      "name": "Dalhousie",
+      "tagline": "The Mini Switzerland of India",
+      "description": "Dalhousie is a peaceful hill station known for its colonial charm, pine forests, and scenic mountain views. It is a perfect destination for families, couples, and nature lovers looking to relax and enjoy the beauty of Himachal Pradesh.",
+      "bestTime": "March to June",
+      "altitude": "6,460 ft",
+      "vibe": "Relaxation & Nature",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777197442/himvigo/destinations/pct6scqrxy3jr1gtc6sd.png",
+      "highlights": [
+        "Khajjiar (Mini Switzerland)",
+        "Dainkund Peak",
+        "Panchpula Waterfall",
+        "St. John Church",
+        "Dalhousie Mall Road"
+      ],
+      "isActive": true,
+      "sortOrder": 1,
+      "metaTitle": "",
+      "metaDescription": "",
+      "metaKeywords": "",
+      "createdAt": "2026-04-26T04:01:09.768Z",
+      "updatedAt": "2026-04-26T04:01:09.768Z"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "cmo7juotx0008l0pzn7mzm6ln",
+      "name": "Rahul Sharma",
+      "text": "The Spiti expedition was mind-blowing.",
+      "packageName": "Spiti Valley Road Trip",
+      "rating": 5,
+      "isActive": true,
+      "createdAt": "2026-04-20T13:19:53.973Z",
+      "updatedAt": "2026-04-20T13:19:53.973Z"
+    },
+    {
+      "id": "cmo7jupav0009l0pz7oah05jt",
+      "name": "Priya Desai",
+      "text": "Booked a tempo traveller for my family. Seamless!",
+      "packageName": "Manali Premium Snow Retreat",
+      "rating": 5,
+      "isActive": true,
+      "createdAt": "2026-04-20T13:19:54.583Z",
+      "updatedAt": "2026-04-20T13:19:54.583Z"
+    },
+    {
+      "id": "cmo7mdbt8000l0qpzgsi8x7an",
+      "name": "Amit Kumar",
+      "text": "Kheerganga trek was an amazing experience. Our guide was very friendly and made sure we were comfortable. Food at the camp was delicious.",
+      "packageName": "Kasol & Kheerganga Backpacking",
+      "rating": 4,
+      "isActive": true,
+      "createdAt": "2026-04-20T14:30:22.796Z",
+      "updatedAt": "2026-04-20T14:30:22.796Z"
+    },
+    {
+      "id": "cmo7mdcaa000m0qpzw4ha5xx1",
+      "name": "Neha Gupta",
+      "text": "Smooth booking process and great itinerary. Shimla and Manali both were beautiful. Driver was punctual and polite.",
+      "packageName": "Shimla Manali Family Delight",
+      "rating": 5,
+      "isActive": true,
+      "createdAt": "2026-04-20T14:30:23.410Z",
+      "updatedAt": "2026-04-20T14:30:23.410Z"
+    },
+    {
+      "id": "cmo7mk9qa000h3fpzfitk7y9y",
+      "name": "Arjun Mehta",
+      "text": "I wanted an offbeat track in Kinnaur, and Himvigo delivered. Local knowledge makes a huge difference.",
+      "packageName": "Custom Kinnaur Tour",
+      "rating": 5,
+      "isActive": true,
+      "createdAt": "2026-04-20T14:35:46.690Z",
+      "updatedAt": "2026-04-20T14:35:46.690Z"
+    }
+  ],
+  "activities": [
+    {
+      "id": "cmo7mk6er000c3fpzy2wuqs7x",
+      "title": "Snow Skiing",
+      "description": "Slide down the powdery slopes of Solang Valley and Kufri.",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777197959/himvigo/activities/pxqowcevp00ysbwmy3dd.jpg",
+      "location": "Solang Valley",
+      "icon": "Snowflake",
+      "isActive": true,
+      "sortOrder": 5,
+      "createdAt": "2026-04-20T14:35:42.387Z",
+      "updatedAt": "2026-04-20T14:35:42.387Z"
+    },
+    {
+      "id": "cmo7mk5xo000b3fpzg9aiedoy",
+      "title": "Alpine Camping",
+      "description": "Sleep under a million stars in the high-altitude cold deserts and lush meadows.",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777198103/himvigo/activities/kqrew73v5u1jkkdp23hj.jpg",
+      "location": "Spiti & Chandratal",
+      "icon": "Compass",
+      "isActive": true,
+      "sortOrder": 4,
+      "createdAt": "2026-04-20T14:35:41.772Z",
+      "updatedAt": "2026-04-20T14:35:41.772Z"
+    },
+    {
+      "id": "cmo7md7kl000d0qpzb3zjwhqv",
+      "title": "Skiing",
+      "description": "Enjoy the snow and slide down the powdery slopes in winters.",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777198219/himvigo/activities/oszavqgosurdrcq02qei.jpg",
+      "location": "Solang Valley",
+      "icon": "Snowflake",
+      "isActive": true,
+      "sortOrder": 4,
+      "createdAt": "2026-04-20T14:30:17.301Z",
+      "updatedAt": "2026-04-20T14:30:17.301Z"
+    },
+    {
+      "id": "cmo7md74s000c0qpzy6r8if0x",
+      "title": "Trekking",
+      "description": "Trek through lush green mountains and relax in natural hot springs.",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777198398/himvigo/activities/sykmmhfsvpifrk8el4jo.png",
+      "location": "Kheerganga",
+      "icon": "Mountain",
+      "isActive": true,
+      "sortOrder": 3,
+      "createdAt": "2026-04-20T14:30:16.732Z",
+      "updatedAt": "2026-04-20T14:30:16.732Z"
+    },
+    {
+      "id": "cmo7md6ob000b0qpz6uog0s8m",
+      "title": "Paragliding",
+      "description": "Soar high in the sky at the paragliding capital of India.",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777198494/himvigo/activities/cmgbptziazlxohit1zoo.png",
+      "location": "Bir Billing",
+      "icon": "Wind",
+      "isActive": true,
+      "sortOrder": 2,
+      "createdAt": "2026-04-20T14:30:16.139Z",
+      "updatedAt": "2026-04-20T14:30:16.139Z"
+    },
+    {
+      "id": "cmo7md67g000a0qpzof7n4ocw",
+      "title": "River Rafting",
+      "description": "Experience thrilling white water river rafting in the Beas river.",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777198585/himvigo/activities/pp7dgwrsx7dgsskjzazw.png",
+      "location": "Kullu",
+      "icon": "Waves",
+      "isActive": true,
+      "sortOrder": 1,
+      "createdAt": "2026-04-20T14:30:15.532Z",
+      "updatedAt": "2026-04-20T14:30:15.532Z"
+    },
+    {
+      "id": "cmo7mk4zp000a3fpzrup7lyts",
+      "title": "Mountain Trekking",
+      "description": "Explore the untouched trails of the Great Himalayan National Park and Spiti Valley.",
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777198722/himvigo/activities/e8k16np4ju0qrkz4znxh.webp",
+      "location": "Spiti & Manali",
+      "icon": "Compass",
+      "isActive": true,
+      "sortOrder": 1,
+      "createdAt": "2026-04-20T14:35:40.549Z",
+      "updatedAt": "2026-04-20T14:35:40.549Z"
+    }
+  ],
+  "cab_vehicles": [
+    {
+      "id": "cmo7mk7te000f3fpztwmlqiwl",
+      "name": "Force Traveler",
+      "model": "12 / 17 Seater",
+      "capacity": "Up to 17 Passengers",
+      "ideal": "Corporate groups, Large families",
+      "features": [
+        "High Roof",
+        "Reclining Seats",
+        "Music System",
+        "Dedicated Support"
+      ],
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777192819/himvigo/cab/foim56boeoh7rkuuygkq.png",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:35:44.210Z",
+      "updatedAt": "2026-04-20T14:35:44.210Z"
+    },
+    {
+      "id": "cmo7mk7bt000e3fpzcw8ffewz",
+      "name": "Luxury Sedan",
+      "model": "Maruti Suzuki Dzire / Toyota Etios",
+      "capacity": "4 Passengers",
+      "ideal": "Couples, Small groups",
+      "features": [
+        "AC",
+        "Bluetooth Music",
+        "Clean Interiors",
+        "On-time Pickup"
+      ],
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777192954/himvigo/cab/urb8az15qi0lkhzd5yq8.png",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:35:43.577Z",
+      "updatedAt": "2026-04-20T14:35:43.577Z"
+    },
+    {
+      "id": "cmo7mk6vw000d3fpzvem90clt",
+      "name": "Premium SUV",
+      "model": "Toyota Innova Crysta",
+      "capacity": "6-7 Pasengers",
+      "ideal": "Family trips, Long expeditions",
+      "features": [
+        "Dual AC",
+        "Premium Seating",
+        "Ample Luggage space",
+        "Expert Mountain Driver"
+      ],
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777193056/himvigo/cab/wadldyi1aqmyvuojhxzv.png",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:35:43.005Z",
+      "updatedAt": "2026-04-20T14:35:43.005Z"
+    },
+    {
+      "id": "cmo7md8hr000f0qpzk2mtxzjt",
+      "name": "SUV",
+      "model": "Innova Crysta",
+      "capacity": "6-7 Passengers",
+      "ideal": "Families, Group of Friends",
+      "features": [
+        "AC",
+        "Extra Luggage Space",
+        "Comfortable Seats",
+        "Music System"
+      ],
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777193236/himvigo/cab/wttdtadlywecpxpuvgki.png",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:30:18.495Z",
+      "updatedAt": "2026-04-20T14:30:18.495Z"
+    },
+    {
+      "id": "cmo7md80p000e0qpzzzcu7jm6",
+      "name": "Sedan",
+      "model": "Dzire / Etios",
+      "capacity": "4 Passengers",
+      "ideal": "Couples, Small Families",
+      "features": [
+        "AC",
+        "Luggage Space",
+        "Music System"
+      ],
+      "image": "https://res.cloudinary.com/dk4khltyq/image/upload/v1777193344/himvigo/cab/imhhogm6ehn8j0a877go.png",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:30:17.881Z",
+      "updatedAt": "2026-04-20T14:30:17.881Z"
+    }
+  ],
+  "cab_routes": [
+    {
+      "id": "cmo7md9fw000h0qpzbry2naow",
+      "fromCity": "Chandigarh",
+      "toCity": "Shimla",
+      "price": "Starts from ₹2,500",
+      "duration": "3-4 Hours",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:30:19.724Z",
+      "updatedAt": "2026-04-20T14:30:19.724Z"
+    },
+    {
+      "id": "cmo7md9w9000i0qpzh5iv4ou9",
+      "fromCity": "Chandigarh",
+      "toCity": "Manali",
+      "price": "Starts from ₹4,500",
+      "duration": "8-9 Hours",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:30:20.313Z",
+      "updatedAt": "2026-04-20T14:30:20.313Z"
+    },
+    {
+      "id": "cmo7mdae0000j0qpzp80u66ki",
+      "fromCity": "Delhi",
+      "toCity": "Manali",
+      "price": "Starts from ₹8,000",
+      "duration": "12-14 Hours",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:30:20.952Z",
+      "updatedAt": "2026-04-20T14:30:20.952Z"
+    },
+    {
+      "id": "cmo7mdav4000k0qpze7065hld",
+      "fromCity": "Shimla",
+      "toCity": "Manali",
+      "price": "Starts from ₹6,500",
+      "duration": "7-8 Hours",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:30:21.568Z",
+      "updatedAt": "2026-04-20T14:30:21.568Z"
+    },
+    {
+      "id": "cmo7mk8s5000g3fpz42dxgghn",
+      "fromCity": "Manali",
+      "toCity": "Spiti Valley",
+      "price": "Inquire for Quote",
+      "duration": "Expedition",
+      "isActive": true,
+      "createdAt": "2026-04-20T14:35:45.461Z",
+      "updatedAt": "2026-04-20T14:35:45.461Z"
+    }
+  ],
+  "site_settings": [
+    {
+      "id": "cmo8v4w8l000004k1km6s62re",
+      "key": "site_name",
+      "value": "himvigo",
+      "updatedAt": "2026-04-25T12:21:22.601Z"
+    },
+    {
+      "id": "cmo8v4w99000204k1stauc8p8",
+      "key": "site_email",
+      "value": "himvigotravels@gmail.com",
+      "updatedAt": "2026-04-25T12:21:22.619Z"
+    },
+    {
+      "id": "cmo8v4w9i000304k1nthqt1li",
+      "key": "site_address",
+      "value": "H No. 41/1/9, Bhagwan Mohalla Mandi (H.P) 175001",
+      "updatedAt": "2026-04-25T12:21:22.626Z"
+    },
+    {
+      "id": "cmo8v4wa0000504k1rb42kq8j",
+      "key": "site_instagram",
+      "value": "https://www.instagram.com/himvigo?igsh=MTZ3OHF6YngxemJs&utm_source=qr",
+      "updatedAt": "2026-04-25T12:21:22.638Z"
+    },
+    {
+      "id": "cmo8v4wa9000604k1kgn1fpmt",
+      "key": "site_facebook",
+      "value": "https://www.facebook.com/share/1CeBrXT2vH/?mibextid=wwXIfr",
+      "updatedAt": "2026-04-25T12:21:22.646Z"
+    },
+    {
+      "id": "cmo8v4wah000704k1gl9d8pn5",
+      "key": "site_youtube",
+      "value": "https://www.youtube.com/channel/UCXxcIrkoHvVZa0D7Sw4Wj6g",
+      "updatedAt": "2026-04-25T12:21:22.659Z"
+    },
+    {
+      "id": "cmoadcb2q0000cdpzg3r9luoq",
+      "key": "hero_headline",
+      "value": "Your Himachal Adventure Starts Here",
+      "updatedAt": "2026-04-25T12:21:22.666Z"
+    },
+    {
+      "id": "cmoadcd8k0001cdpzhf1dyxjz",
+      "key": "hero_subheadline",
+      "value": "Safe rides. Local expertise. Unforgettable journeys through the heart of the Himalayas.",
+      "updatedAt": "2026-04-25T12:21:22.679Z"
+    },
+    {
+      "id": "cmoadcdjp0002cdpz9hc8gabb",
+      "key": "hero_cta_text",
+      "value": "Plan Your Trip",
+      "updatedAt": "2026-04-25T12:21:22.686Z"
+    },
+    {
+      "id": "cmoadcds60003cdpz8eu6g12m",
+      "key": "hero_cta_call",
+      "value": "Call Us Now",
+      "updatedAt": "2026-04-25T12:21:22.699Z"
+    },
+    {
+      "id": "cmoadce0l0004cdpzrkcmncx9",
+      "key": "about_who_we_are",
+      "value": "Himvigo is a Himachal Pradesh-based travel company built by locals who know these mountains like the back of their hand. We connect travelers with verified drivers, comfortable vehicles, and thoughtfully designed tour packages across the state's most breathtaking destinations.\n\nWe started with a simple belief: traveling through Himachal should feel easy, safe, and genuinely enjoyable—not stressful. Whether you're planning a honeymoon in Manali, a family vacation to Shimla, or an adventure trip to Spiti Valley with friends, we handle the logistics so you can focus on making memories.",
+      "updatedAt": "2026-04-25T12:21:22.706Z"
+    },
+    {
+      "id": "cmoadce910005cdpz84jj7qid",
+      "key": "about_trust_us_json",
+      "value": "[{\"title\":\"Local knowledge\",\"desc\":\"Our team lives and works in Himachal. We know the roads, the weather patterns, the hidden spots, and the best times to visit.\"},{\"title\":\"Verified drivers\",\"desc\":\"Every driver in our network is background-checked, experienced in mountain driving, and committed to your safety.\"},{\"title\":\"Transparent pricing\",\"desc\":\"No surprise charges. No hidden fees. The price we quote is the price you pay.\"},{\"title\":\"Real support\",\"desc\":\"Questions at midnight? Route changes? We're available around the clock to help.\"}]",
+      "updatedAt": "2026-04-25T12:21:22.719Z"
+    },
+    {
+      "id": "cmoadcehi0006cdpzspe4z6sd",
+      "key": "service_packages_desc",
+      "value": "Thoughtfully planned itineraries covering Himachal's most loved destinations—Manali, Shimla, Dharamshala, Kasol, Spiti Valley, and Leh Ladakh. Each package includes comfortable stays, reliable transport, and local insights that make your trip special.\n\nChoose from honeymoon packages, family tours, adventure trips, or spiritual journeys. We design routes that balance must-see spots with enough breathing room to actually enjoy them.",
+      "updatedAt": "2026-04-25T12:21:22.726Z"
+    },
+    {
+      "id": "cmoadcepz0007cdpzpkocsuqw",
+      "key": "service_cab_desc",
+      "value": "Reliable cab service across Himachal Pradesh with verified, experienced drivers. Whether you need an airport pickup, a one-way drop, or a multi-day rental, we match you with clean, well-maintained vehicles and drivers who know mountain roads.\n\nAvailable vehicles include hatchbacks, sedans, SUVs, and MUVs—suitable for solo travelers, couples, and small families.",
+      "updatedAt": "2026-04-25T12:21:22.739Z"
+    },
+    {
+      "id": "cmo8v4w90000104k1r04kap5z",
+      "key": "site_phone",
+      "value": "+91-9805514018",
+      "updatedAt": "2026-04-25T12:21:22.746Z"
+    },
+    {
+      "id": "cmo8v4w9r000404k10928z2gn",
+      "key": "site_whatsapp",
+      "value": "+91-9805514018",
+      "updatedAt": "2026-04-25T12:21:22.759Z"
+    },
+    {
+      "id": "cmoadceyg0008cdpz6fwkouba",
+      "key": "service_tempo_desc",
+      "value": "Traveling with a group? Our tempo travellers seat 9 to 26 passengers comfortably, making them ideal for college trips, family reunions, corporate outings, and friend groups exploring Himachal together.\n\nAll vehicles come with experienced drivers, ample luggage space, and the reliability you need for mountain journeys.",
+      "updatedAt": "2026-04-25T12:21:22.779Z"
+    },
+    {
+      "id": "cmoadcf6z0009cdpzd7n0xmf6",
+      "key": "service_custom_desc",
+      "value": "Not finding what you're looking for in our packages? Tell us what you have in mind. We'll build a custom itinerary around your dates, budget, interests, and group size—whether that's a week-long road trip through Lahaul or a quick weekend getaway to Kasol.",
+      "updatedAt": "2026-04-25T12:21:22.786Z"
+    },
+    {
+      "id": "cmoadcfg5000acdpz40p6ysau",
+      "key": "why_choose_us_json",
+      "value": "[{\"title\":\"Verified Drivers\",\"desc\":\"Every driver is background-checked and skilled in navigating Himachal's mountain roads safely.\",\"image\":\"/hero-1.png\",\"icon\":\"RiShieldCheckLine\"},{\"title\":\"24/7 Support\",\"desc\":\"Travel questions don't follow business hours. Reach us anytime—before, during, or after your trip.\",\"image\":\"/hero-2.png\",\"icon\":\"RiGroupLine\"},{\"title\":\"Affordable Pricing\",\"desc\":\"Competitive rates with no hidden costs. We believe quality travel shouldn't break the bank.\",\"image\":\"/hero-spiti.png\",\"icon\":\"RiTrophyLine\"},{\"title\":\"Local Travel Experts\",\"desc\":\"We're based in Himachal. We know the terrain, the seasons, and the insider tips that make trips better.\",\"image\":\"/kasol.png\",\"icon\":\"RiCompass3Line\"},{\"title\":\"Comfortable Vehicles\",\"desc\":\"Clean, well-maintained cars and tempo travellers with experienced drivers for every journey.\",\"image\":\"/manali-hero.png\",\"icon\":\"RiCarLine\"},{\"title\":\"Flexible Booking\",\"desc\":\"Change of plans? We work with you. Flexibility is part of how we operate.\",\"image\":\"/spiti-hero.png\",\"icon\":\"RiCheckboxCircleLine\"}]",
+      "updatedAt": "2026-04-25T12:21:22.794Z"
+    },
+    {
+      "id": "cmoadcfoo000bcdpzaaevs3yd",
+      "key": "bottom_cta_headline",
+      "value": "Ready to Explore Himachal?",
+      "updatedAt": "2026-04-25T12:21:22.817Z"
+    },
+    {
+      "id": "cmoadcfx9000ccdpzoooo0h0m",
+      "key": "bottom_cta_subheadline",
+      "value": "Your mountains are waiting. Tell us where you want to go, and we'll take care of the rest—from comfortable rides to local recommendations that make the trip yours.",
+      "updatedAt": "2026-04-25T12:21:22.825Z"
+    },
+    {
+      "id": "cmoadcg5r000dcdpzyui71or1",
+      "key": "bottom_cta_quote",
+      "value": "Get a Free Quote",
+      "updatedAt": "2026-04-25T12:21:22.833Z"
+    },
+    {
+      "id": "cmoadcgx1000gcdpztei33abj",
+      "key": "site_tagline",
+      "value": "Travel Himachal with confidence.",
+      "updatedAt": "2026-04-25T12:21:22.841Z"
+    },
+    {
+      "id": "cmobtmo7h000004jrvoqkgmsw",
+      "key": "seo_home_title",
+      "value": "Best Himachal Tour Packages | Himvigo Tours",
+      "updatedAt": "2026-04-26T07:11:44.900Z"
+    },
+    {
+      "id": "cmobtmo7t000104jr7ny5rslz",
+      "key": "seo_home_description",
+      "value": "Premium Spiti Valley tours and Chandigarh to Manali cab services.",
+      "updatedAt": "2026-04-26T07:11:44.920Z"
+    },
+    {
+      "id": "cmobtmo87000204jrdau0e2jh",
+      "key": "seo_home_keywords",
+      "value": "himachal tours, spiti valley",
+      "updatedAt": "2026-04-26T07:11:44.929Z"
+    },
+    {
+      "id": "cmobtmo8f000304jrwe4vykc7",
+      "key": "seo_packages_title",
+      "value": "Tour Packages | Himvigo Tours",
+      "updatedAt": "2026-04-26T07:11:44.948Z"
+    },
+    {
+      "id": "cmobtmo8r000404jr5aw87y64",
+      "key": "seo_packages_description",
+      "value": "Browse all tour packages.",
+      "updatedAt": "2026-04-26T07:11:44.959Z"
+    },
+    {
+      "id": "cmobtmo8z000504jr2htz01ro",
+      "key": "seo_packages_keywords",
+      "value": "tour packages",
+      "updatedAt": "2026-04-26T07:11:44.968Z"
+    },
+    {
+      "id": "cmobtmo9b000604jrphutoaaz",
+      "key": "seo_blog_title",
+      "value": "Travel Blog | Himvigo Tours",
+      "updatedAt": "2026-04-26T07:11:44.979Z"
+    },
+    {
+      "id": "cmobtmo9v000704jradzc7ryc",
+      "key": "seo_blog_description",
+      "value": "Travel stories and guides.",
+      "updatedAt": "2026-04-26T07:11:44.988Z"
+    },
+    {
+      "id": "cmobtmoa4000804jrszy1sr25",
+      "key": "seo_blog_keywords",
+      "value": "travel blog",
+      "updatedAt": "2026-04-26T07:11:45.008Z"
+    },
+    {
+      "id": "cmobtmoaf000904jrb753xyrb",
+      "key": "seo_destinations_title",
+      "value": "Destinations | Himvigo Tours",
+      "updatedAt": "2026-04-26T07:11:45.017Z"
+    },
+    {
+      "id": "cmobtmoao000a04jroorupex7",
+      "key": "seo_destinations_description",
+      "value": "Explore Himachal destinations.",
+      "updatedAt": "2026-04-26T07:11:45.026Z"
+    },
+    {
+      "id": "cmobtmoaz000b04jrt6z6kwfd",
+      "key": "seo_destinations_keywords",
+      "value": "destinations",
+      "updatedAt": "2026-04-26T07:11:45.035Z"
+    },
+    {
+      "id": "cmobtmob7000c04jribknvpot",
+      "key": "seo_cab_title",
+      "value": "Cab Services | Himvigo Tours",
+      "updatedAt": "2026-04-26T07:11:45.044Z"
+    },
+    {
+      "id": "cmobtmobj000d04jr3g54qs48",
+      "key": "seo_cab_description",
+      "value": "Book reliable cab services.",
+      "updatedAt": "2026-04-26T07:11:45.054Z"
+    },
+    {
+      "id": "cmobtmobr000e04jrzrr8rky5",
+      "key": "seo_cab_keywords",
+      "value": "cab, taxi",
+      "updatedAt": "2026-04-26T07:11:45.063Z"
+    },
+    {
+      "id": "cmobtmoc3000f04jrm825o5il",
+      "key": "seo_contact_title",
+      "value": "Contact Us | Himvigo Tours",
+      "updatedAt": "2026-04-26T07:11:45.072Z"
+    },
+    {
+      "id": "cmobtmocb000g04jruo5c5wa6",
+      "key": "seo_contact_description",
+      "value": "Get in touch.",
+      "updatedAt": "2026-04-26T07:11:45.081Z"
+    },
+    {
+      "id": "cmobtmocn000h04jrm1vtimil",
+      "key": "seo_contact_keywords",
+      "value": "contact",
+      "updatedAt": "2026-04-26T07:11:45.090Z"
+    }
+  ],
+  "admin_users": [
+    {
+      "id": "cmo7jum7i0000l0pzgkdlt7yr",
+      "email": "admin@himvigo.in",
+      "password": "$2b$12$7BDwLEA9oaIp2YPLDS7x3O4V83aZmQZ7ri/lXP8X1mJlxma8BBiK6",
+      "createdAt": "2026-04-20T13:19:50.574Z"
+    }
+  ],
+  "inquiries": [
+    {
+      "id": "cmob8cvhd000004jodnqk2ue3",
+      "name": "Mohit",
+      "phone": "7018318824",
+      "fromCity": null,
+      "toCity": null,
+      "travelDate": null,
+      "passengers": null,
+      "duration": null,
+      "message": null,
+      "status": "new",
+      "createdAt": "2026-04-23T03:09:11.713Z",
+      "updatedAt": "2026-04-23T03:09:11.713Z",
+      "adults": 2,
+      "children": 1,
+      "dropDate": "2026-04-29T18:30:00.000Z",
+      "dropLocation": "Manali",
+      "email": "kewalthakur351@gmail.com",
+      "pickupDate": "2026-04-24T18:30:00.000Z",
+      "pickupLocation": "Chandigarh"
+    },
+    {
+      "id": "cmobta88m000004jxximif1e1",
+      "name": "Testing by Aakash",
+      "phone": "99769343445",
+      "fromCity": null,
+      "toCity": null,
+      "travelDate": null,
+      "passengers": null,
+      "duration": null,
+      "message": "fiuqwfhiunefn ewkfvhewiofnklew  keiofhenfkefv",
+      "status": "new",
+      "createdAt": "2026-04-23T12:55:00.214Z",
+      "updatedAt": "2026-04-23T12:55:00.214Z",
+      "adults": 2,
+      "children": 1,
+      "dropDate": "2026-04-25T18:30:00.000Z",
+      "dropLocation": "Manali",
+      "email": "xyz@gmail.com",
+      "pickupDate": "2026-04-23T18:30:00.000Z",
+      "pickupLocation": "Chandigarh"
+    }
+  ]
+}

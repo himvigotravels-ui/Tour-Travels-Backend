@@ -25,6 +25,7 @@ model Package {
   categories      String   // Stored as serialized JSON string in SQLite
   isFeatured      Boolean  @default(false)
   isActive        Boolean  @default(true)
+  isTrek          Boolean  @default(false)
   metaTitle       String?
   metaDescription String?
   metaKeywords    String?
