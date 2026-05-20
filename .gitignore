@@ -8,3 +8,4 @@ tour-travels.db
 *.db
 *.db-journal
 .DS_Store
+.seeded

@@ -5,9 +5,10 @@ import { PrismaClient } from "@prisma/client";
 
 dotenv.config();
 
-// Ensure DATABASE_URL is always set (Render persistent disk fallback)
+// Ensure DATABASE_URL is always set — falls back to local prisma dir
+// start.sh will override this to /var/data/tour-travels.db when a persistent disk is available
 if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = "file:/var/data/tour-travels.db";
+  process.env.DATABASE_URL = "file:./prisma/dev.db";
 }
 
 const app = express();

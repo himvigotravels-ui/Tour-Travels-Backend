@@ -11,8 +11,4 @@ services:
       - key: API_SECRET_KEY
         value: himvigo-super-secret-key-2026
       - key: DATABASE_URL
-        value: file:/var/data/tour-travels.db
-    disk:
-      name: sqlite-data
-      mountPath: /var/data
-      sizeGB: 1
+        value: file:./prisma/dev.db
