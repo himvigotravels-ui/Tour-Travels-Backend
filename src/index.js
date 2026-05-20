@@ -272,6 +272,29 @@ app.post("/api/admin/settings", authenticate, (req, res) => {
   } catch (e) { fail(res, e); }
 });
 
+// Manual reseed trigger. Useful when the on-boot seed got skipped or
+// the DB lost data on a Render restart. Idempotent (the seed only does
+// upserts) so it's safe to call as often as you like.
+app.post("/api/admin/reseed", authenticate, async (_req, res) => {
+  try {
+    const before = run("destination", "count", {});
+    const mod = await import("../db/seed.js?ts=" + Date.now());
+    if (mod.seed) await mod.seed();
+    const after = {
+      destinations: run("destination", "count", {}),
+      packages: run("package", "count", {}),
+      packagesTrek: run("package", "count", { where: { isTrek: true } }),
+      blogs: run("blog", "count", {}),
+      siteSettings: run("siteSetting", "count", {}),
+      internalPages: run("internalPage", "count", {}),
+    };
+    ok(res, { reseeded: true, destinationsBefore: before, after });
+  } catch (e) {
+    console.error("Reseed failed:", e);
+    res.status(500).json({ error: e.message || String(e), stack: e.stack });
+  }
+});
+
 // =========================================================================
 // UNIVERSAL PRISMA-STYLE RPC (kept for the frontend's lib/prisma.ts proxy)
 // =========================================================================

@@ -254,7 +254,7 @@ const TREK_NAV_GROUPS = [
 
 // ─── Seed orchestration ────────────────────────────────────────────────
 
-async function seed() {
+export async function seed() {
   console.log("🌱 Seeding SQLite database...");
   const backup = loadBackup();
 
@@ -484,7 +484,14 @@ async function seed() {
   console.log("✅ seed complete.");
 }
 
-seed().catch((e) => {
-  console.error("❌ seed failed:", e);
-  process.exit(1);
-});
+// When invoked directly via `node db/seed.js` (as start.sh does), run
+// the seed immediately. When imported by the API for /admin/reseed,
+// just expose the function and let the caller invoke it.
+const isMain = import.meta.url === `file://${process.argv[1].replace(/\\/g, "/")}` ||
+  process.argv[1]?.endsWith("seed.js");
+if (isMain) {
+  seed().catch((e) => {
+    console.error("❌ seed failed:", e);
+    process.exit(1);
+  });
+}
