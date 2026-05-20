@@ -1,11 +1,14 @@
 node_modules/
 .env
-dev.db
-dev.db-journal
-dev.db-shm
-dev.db-wal
-tour-travels.db
+.DS_Store
+
+# SQLite runtime files
+db/dev.db
+db/dev.db-journal
+db/dev.db-shm
+db/dev.db-wal
+db/.seeded
 *.db
 *.db-journal
-.DS_Store
-.seeded
+*.db-shm
+*.db-wal

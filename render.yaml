@@ -3,15 +3,15 @@ services:
     name: tour-travels-backend
     runtime: node
     repo: https://github.com/himvigotravels-ui/Tour-Travels-Backend.git
-    buildCommand: npm install && npx prisma generate
+    buildCommand: npm install
     startCommand: sh start.sh
     envVars:
       - key: PORT
         value: 3001
       - key: API_SECRET_KEY
         value: himvigo-super-secret-key-2026
-      # SQLite file lives in the project's prisma/ dir. Ephemeral on
-      # Render free tier (resets on redeploy) — fine for this app
-      # because start.sh re-seeds whenever the .seeded marker is absent.
-      - key: DATABASE_URL
-        value: file:./prisma/dev.db
+      # SQLite file lives in db/dev.db inside the app directory. Ephemeral
+      # on Render free tier (resets on redeploy) — fine because start.sh
+      # re-seeds whenever the .seeded marker is absent.
+      - key: DATABASE_FILE
+        value: ./db/dev.db

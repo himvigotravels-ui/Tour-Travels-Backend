@@ -1,804 +1,305 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { PrismaClient } from "@prisma/client";
+
+import "./db.js"; // initialise SQLite + apply schema
+import { run, transaction } from "./query.js";
 
 dotenv.config();
-
-// SQLite lives in the project's prisma/ dir (./prisma/dev.db). Render's
-// app filesystem is writable for the lifetime of the instance, which is
-// enough here. If DATABASE_URL is unset (local dev) we default to the
-// same path. We intentionally do NOT try /var/data — that path is only
-// available on Render with a paid persistent disk.
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = "file:./prisma/dev.db";
-}
-console.log("📦 Active DATABASE_URL:", process.env.DATABASE_URL);
-console.log("📂 CWD:", process.cwd());
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Initialize Prisma Client with SQLite
-const prisma = new PrismaClient();
-
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 
-// SQLite Array/JSON Serialization fields mapping
-const JSON_FIELDS = {
-  package: ["imageUrls", "itinerary", "inclusions", "exclusions", "categories"],
-  blog: ["tags"],
-  destination: ["highlights", "categories"],
-  cabVehicle: ["features"]
-};
+// ─── Auth middleware (for writing / admin endpoints) ───────────────────
 
-// Convert arrays/objects in arguments to JSON strings for SQLite
-const serializeObj = (model, obj) => {
-  if (!model || !obj || typeof obj !== "object") return obj;
-  const fields = JSON_FIELDS[model];
-  if (!fields) return obj;
+const EXPECTED_SECRET =
+  process.env.API_SECRET_KEY || "himvigo-super-secret-key-2026";
 
-  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
-  
-  for (const key in newObj) {
-    if (fields.includes(key)) {
-      const val = newObj[key];
-      if (val !== undefined && val !== null) {
-        if (typeof val === "object" && !Array.isArray(val)) {
-          const opObj = { ...val };
-          for (const opKey in opObj) {
-            if (opKey === "set" || opKey === "push") {
-              opObj[opKey] = JSON.stringify(opObj[opKey]);
-            }
-          }
-          newObj[key] = opObj;
-        } else {
-          newObj[key] = JSON.stringify(val);
-        }
-      }
-    } else if (newObj[key] && typeof newObj[key] === "object") {
-      newObj[key] = serializeObj(model, newObj[key]);
-    }
-  }
-  return newObj;
-};
-
-// Convert JSON strings in database result back to arrays/objects for Next.js frontend
-const deserializeObj = (model, obj) => {
-  if (!model || !obj || typeof obj !== "object") return obj;
-
-  if (Array.isArray(obj)) {
-    return obj.map(item => deserializeObj(model, item));
-  }
-
-  const fields = JSON_FIELDS[model];
-  const newObj = { ...obj };
-
-  if (fields) {
-    for (const key of fields) {
-      if (typeof newObj[key] === "string") {
-        try {
-          newObj[key] = JSON.parse(newObj[key]);
-        } catch (e) {
-          // Keep as string if it fails to parse
-        }
-      }
-    }
-  }
-
-  // Recursively deserialize nested models/relations
-  for (const key in newObj) {
-    if (newObj[key] && typeof newObj[key] === "object") {
-      // Guess model type based on relation key name
-      let nestedModel = null;
-      if (key === "packages") nestedModel = "package";
-      else if (key === "destinations") nestedModel = "destination";
-      else if (key === "blogs") nestedModel = "blog";
-      else if (key === "cabVehicles") nestedModel = "cabVehicle";
-      
-      newObj[key] = deserializeObj(nestedModel || key, newObj[key]);
-    }
-  }
-
-  return newObj;
-};
-
-// Security middleware: verify client authentication secret (for all writing / admin endpoints)
-const authenticate = (req, res, next) => {
-  const secretKey = req.headers["x-api-key"] || req.headers["authorization"]?.split(" ")[1];
-  const expectedSecret = process.env.API_SECRET_KEY || "himvigo-super-secret-key-2026";
-  
-  if (!secretKey || secretKey !== expectedSecret) {
+function authenticate(req, res, next) {
+  const secret =
+    req.headers["x-api-key"] ||
+    req.headers["authorization"]?.split(" ")[1];
+  if (!secret || secret !== EXPECTED_SECRET) {
     return res.status(401).json({ error: "Unauthorized: Invalid or missing API key." });
   }
   next();
+}
+
+// ─── Tiny helpers ──────────────────────────────────────────────────────
+
+const ok = (res, data) => res.json(data);
+const fail = (res, err) => {
+  console.error(err);
+  res.status(500).json({ error: err.message || String(err) });
 };
 
-// Health Check
-app.get("/health", (req, res) => {
-  res.json({ status: "healthy", database: "sqlite", timestamp: new Date() });
-});
+// ─── Health & root ─────────────────────────────────────────────────────
 
-app.get("/", (req, res) => {
-  res.send("Tour & Travels SQLite API Server is running.");
-});
+app.get("/", (_req, res) => res.send("Tour & Travels SQLite API Server is running."));
+app.get("/health", (_req, res) =>
+  res.json({ status: "healthy", database: "sqlite", timestamp: new Date() })
+);
 
-// ==========================================
-// 📍 PUBLIC CLIENT REST ENDPOINTS
-// ==========================================
+// =========================================================================
+// PUBLIC ENDPOINTS
+// =========================================================================
 
-// 1. Get Destinations
-app.get("/api/destinations", async (req, res) => {
+// Destinations
+app.get("/api/destinations", (req, res) => {
   try {
     const { active } = req.query;
     const where = {};
     if (active === "true" || active === undefined) where.isActive = true;
-
-    const result = await prisma.destination.findMany({
-      where,
-      orderBy: { sortOrder: "asc" }
-    });
-
-    res.json(deserializeObj("destination", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    ok(res, run("destination", "findMany", { where, orderBy: { sortOrder: "asc" } }));
+  } catch (e) { fail(res, e); }
 });
-
-// 2. Get Destination by Slug
-app.get("/api/destinations/:slug", async (req, res) => {
+app.get("/api/destinations/:slug", (req, res) => {
   try {
-    const { slug } = req.params;
-    const result = await prisma.destination.findFirst({
-      where: { slug, isActive: true }
+    const row = run("destination", "findFirst", {
+      where: { slug: req.params.slug, isActive: true },
     });
-    if (!result) return res.status(404).json({ error: "Destination not found" });
-    res.json(deserializeObj("destination", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    if (!row) return res.status(404).json({ error: "Destination not found" });
+    ok(res, row);
+  } catch (e) { fail(res, e); }
 });
 
-// 3. Get Packages
-app.get("/api/packages", async (req, res) => {
+// Packages
+app.get("/api/packages", (req, res) => {
   try {
     const { featured, active, category, limit } = req.query;
     const where = {};
     if (active === "true" || active === undefined) where.isActive = true;
     if (featured === "true") where.isFeatured = true;
-
-    const findOptions = {
-      where,
-      orderBy: { createdAt: "desc" }
-    };
-
-    if (limit) findOptions.take = parseInt(limit);
-
-    let result = await prisma.package.findMany(findOptions);
-    let deserialized = deserializeObj("package", result);
-
-    // Filter by category in JS since SQLite does not support array query natively
+    const opts = { where, orderBy: { createdAt: "desc" } };
+    if (limit) opts.take = parseInt(limit, 10);
+    let rows = run("package", "findMany", opts);
     if (category) {
-      deserialized = deserialized.filter(p => p.categories && p.categories.includes(category));
+      rows = rows.filter(
+        (p) => Array.isArray(p.categories) && p.categories.includes(category)
+      );
     }
-
-    res.json(deserialized);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    ok(res, rows);
+  } catch (e) { fail(res, e); }
 });
-
-// 4. Get Package by Slug
-app.get("/api/packages/:slug", async (req, res) => {
+app.get("/api/packages/:slug", (req, res) => {
   try {
-    const { slug } = req.params;
-    const result = await prisma.package.findUnique({
-      where: { slug }
-    });
-    if (!result) return res.status(404).json({ error: "Package not found" });
-    res.json(deserializeObj("package", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    const row = run("package", "findFirst", { where: { slug: req.params.slug } });
+    if (!row) return res.status(404).json({ error: "Package not found" });
+    ok(res, row);
+  } catch (e) { fail(res, e); }
 });
 
-// 5. Get Blogs
-app.get("/api/blogs", async (req, res) => {
+// Blogs
+app.get("/api/blogs", (req, res) => {
   try {
     const { published, limit } = req.query;
     const where = {};
     if (published === "true" || published === undefined) where.isPublished = true;
-
-    const findOptions = {
-      where,
-      orderBy: { publishedAt: "desc" }
-    };
-
-    if (limit) findOptions.take = parseInt(limit);
-
-    const result = await prisma.blog.findMany(findOptions);
-    res.json(deserializeObj("blog", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    const opts = { where, orderBy: { publishedAt: "desc" } };
+    if (limit) opts.take = parseInt(limit, 10);
+    ok(res, run("blog", "findMany", opts));
+  } catch (e) { fail(res, e); }
+});
+app.get("/api/blogs/:slug", (req, res) => {
+  try {
+    const row = run("blog", "findFirst", { where: { slug: req.params.slug } });
+    if (!row) return res.status(404).json({ error: "Blog not found" });
+    ok(res, row);
+  } catch (e) { fail(res, e); }
 });
 
-// 6. Get Blog by Slug
-app.get("/api/blogs/:slug", async (req, res) => {
+// Cab
+app.get("/api/cab/vehicles", (_req, res) => {
   try {
-    const { slug } = req.params;
-    const result = await prisma.blog.findUnique({
-      where: { slug }
-    });
-    if (!result) return res.status(404).json({ error: "Blog not found" });
-    res.json(deserializeObj("blog", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 7. Get Cab Vehicles
-app.get("/api/cab/vehicles", async (req, res) => {
-  try {
-    const result = await prisma.cabVehicle.findMany({
+    ok(res, run("cabVehicle", "findMany", {
       where: { isActive: true },
-      orderBy: { updatedAt: "desc" }
-    });
-    res.json(deserializeObj("cabVehicle", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+      orderBy: { updatedAt: "desc" },
+    }));
+  } catch (e) { fail(res, e); }
 });
-
-// 8. Get Cab Routes
-app.get("/api/cab/routes", async (req, res) => {
+app.get("/api/cab/routes", (_req, res) => {
   try {
-    const result = await prisma.cabRoute.findMany({
+    ok(res, run("cabRoute", "findMany", {
       where: { isActive: true },
-      orderBy: { fromCity: "asc" }
-    });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+      orderBy: { fromCity: "asc" },
+    }));
+  } catch (e) { fail(res, e); }
 });
 
-// 9. Get Site Settings
-app.get("/api/settings", async (req, res) => {
+// Settings
+app.get("/api/settings", (_req, res) => {
   try {
-    const settings = await prisma.siteSetting.findMany();
+    const rows = run("siteSetting", "findMany", {});
     const obj = {};
-    settings.forEach((s) => (obj[s.key] = s.value));
-    res.json(obj);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    for (const s of rows) obj[s.key] = s.value;
+    ok(res, obj);
+  } catch (e) { fail(res, e); }
+});
+app.get("/api/settings/:key", (req, res) => {
+  try {
+    const row = run("siteSetting", "findFirst", { where: { key: req.params.key } });
+    ok(res, { value: row?.value || "" });
+  } catch (e) { fail(res, e); }
 });
 
-// 10. Get Single Setting Key
-app.get("/api/settings/:key", async (req, res) => {
-  try {
-    const { key } = req.params;
-    const setting = await prisma.siteSetting.findUnique({ where: { key } });
-    res.json({ value: setting?.value || "" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+// Testimonials / Activities
+app.get("/api/testimonials", (_req, res) => {
+  try { ok(res, run("testimonial", "findMany", { orderBy: { createdAt: "desc" } })); }
+  catch (e) { fail(res, e); }
+});
+app.get("/api/activities", (_req, res) => {
+  try { ok(res, run("activity", "findMany", { orderBy: { sortOrder: "asc" } })); }
+  catch (e) { fail(res, e); }
 });
 
-// 11. Get Testimonials
-app.get("/api/testimonials", async (req, res) => {
+// Internal pages (nav-groups)
+app.get("/api/internal-pages", (_req, res) => {
   try {
-    const result = await prisma.testimonial.findMany({
-      orderBy: { createdAt: "desc" }
-    });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 12. Get Activities
-app.get("/api/activities", async (req, res) => {
-  try {
-    const result = await prisma.activity.findMany({
-      orderBy: { sortOrder: "asc" }
-    });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 13. Get Internal Pages
-app.get("/api/internal-pages", async (req, res) => {
-  try {
-    const pages = await prisma.internalPage.findMany({
+    ok(res, run("internalPage", "findMany", {
       where: { isActive: true },
       orderBy: { sortOrder: "asc" },
       include: {
         packages: { select: { id: true } },
         destinations: { select: { id: true } },
       },
+    }));
+  } catch (e) { fail(res, e); }
+});
+app.get("/api/internal-pages/:slug", (req, res) => {
+  try {
+    const row = run("internalPage", "findFirst", {
+      where: { slug: req.params.slug },
+      include: { packages: true, destinations: true },
     });
-    res.json(deserializeObj("internalPage", pages));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    if (!row) return res.status(404).json({ error: "Internal page not found" });
+    ok(res, row);
+  } catch (e) { fail(res, e); }
 });
 
-// 14. Get Internal Page by Slug
-app.get("/api/internal-pages/:slug", async (req, res) => {
+// Inquiries (public form submission)
+app.post("/api/inquiries", (req, res) => {
   try {
-    const { slug } = req.params;
-    const page = await prisma.internalPage.findUnique({
-      where: { slug },
-      include: {
-        packages: true,
-        destinations: true,
+    const d = req.body || {};
+    const row = run("inquiry", "create", {
+      data: {
+        name: d.name,
+        phone: d.phone,
+        fromCity: d.fromCity,
+        toCity: d.toCity,
+        travelDate: d.travelDate,
+        passengers: d.passengers,
+        duration: d.duration,
+        message: d.message,
+        status: d.status || "new",
+        adults: parseInt(d.adults || 1, 10),
+        children: parseInt(d.children || 0, 10),
+        email: d.email,
+        pickupLocation: d.pickupLocation,
+        pickupDate: d.pickupDate ? new Date(d.pickupDate) : null,
+        dropLocation: d.dropLocation,
+        dropDate: d.dropDate ? new Date(d.dropDate) : null,
       },
     });
-    if (!page) return res.status(404).json({ error: "Internal page not found" });
-    res.json(deserializeObj("internalPage", page));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    ok(res, row);
+  } catch (e) { fail(res, e); }
 });
 
-// 15. Create Customer Inquiry (Public Form Submission)
-app.post("/api/inquiries", async (req, res) => {
+// =========================================================================
+// ADMIN ENDPOINTS (authenticated)
+// =========================================================================
+
+// Login
+app.post("/api/admin/login", authenticate, (req, res) => {
   try {
-    const data = req.body;
-    const result = await prisma.inquiry.create({
-      data: {
-        name: data.name,
-        phone: data.phone,
-        fromCity: data.fromCity,
-        toCity: data.toCity,
-        travelDate: data.travelDate,
-        passengers: data.passengers,
-        duration: data.duration,
-        message: data.message,
-        status: data.status || "new",
-        adults: parseInt(data.adults || 1),
-        children: parseInt(data.children || 0),
-        email: data.email,
-        pickupLocation: data.pickupLocation,
-        pickupDate: data.pickupDate ? new Date(data.pickupDate) : null,
-        dropLocation: data.dropLocation,
-        dropDate: data.dropDate ? new Date(data.dropDate) : null,
-      }
-    });
-    res.json(result);
-  } catch (error) {
-    console.error("Error creating customer inquiry:", error);
-    res.status(500).json({ error: error.message });
-  }
+    const row = run("adminUser", "findFirst", { where: { email: req.body?.email } });
+    ok(res, row);
+  } catch (e) { fail(res, e); }
 });
 
+// A small factory to wire CRUD endpoints for a model with consistent
+// shape. Keeps the file short and the routes uniform.
+function crud(prefix, model, opts = {}) {
+  const listOrder = opts.orderBy || { createdAt: "desc" };
 
-// ==========================================
-// 🔑 ADMIN REST ENDPOINTS (AUTHENTICATED)
-// ==========================================
+  app.get(`/api/admin/${prefix}`, authenticate, (_req, res) => {
+    try { ok(res, run(model, "findMany", { orderBy: listOrder })); }
+    catch (e) { fail(res, e); }
+  });
+  app.post(`/api/admin/${prefix}`, authenticate, (req, res) => {
+    try { ok(res, run(model, "create", { data: req.body })); }
+    catch (e) { fail(res, e); }
+  });
+  app.put(`/api/admin/${prefix}/:id`, authenticate, (req, res) => {
+    try { ok(res, run(model, "update", { where: { id: req.params.id }, data: req.body })); }
+    catch (e) { fail(res, e); }
+  });
+  app.delete(`/api/admin/${prefix}/:id`, authenticate, (req, res) => {
+    try {
+      run(model, "delete", { where: { id: req.params.id } });
+      ok(res, { success: true });
+    } catch (e) { fail(res, e); }
+  });
+}
 
-// 1. Admin Login Verification
-app.post("/api/admin/login", authenticate, async (req, res) => {
+crud("inquiries",     "inquiry",     { orderBy: { createdAt: "desc" } });
+crud("packages",      "package",     { orderBy: { createdAt: "desc" } });
+crud("destinations",  "destination", { orderBy: { sortOrder: "asc" } });
+crud("blogs",         "blog",        { orderBy: { createdAt: "desc" } });
+crud("testimonials",  "testimonial", { orderBy: { createdAt: "desc" } });
+crud("activities",    "activity",    { orderBy: { sortOrder: "asc" } });
+crud("cab/vehicles",  "cabVehicle",  { orderBy: { createdAt: "desc" } });
+crud("cab/routes",    "cabRoute",    { orderBy: { createdAt: "desc" } });
+crud("internal-pages","internalPage",{ orderBy: { sortOrder: "asc" } });
+
+// Settings (upsert each key/value)
+app.post("/api/admin/settings", authenticate, (req, res) => {
   try {
-    const { email } = req.body;
-    const admin = await prisma.adminUser.findUnique({ where: { email } });
-    res.json(admin);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 2. Admin Inquiries Management
-app.get("/api/admin/inquiries", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.inquiry.findMany({ orderBy: { createdAt: "desc" } });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/admin/inquiries", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.inquiry.create({ data: req.body });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/api/admin/inquiries/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const data = req.body;
-    if (data.pickupDate) data.pickupDate = new Date(data.pickupDate);
-    if (data.dropDate) data.dropDate = new Date(data.dropDate);
-    
-    const result = await prisma.inquiry.update({ where: { id }, data });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete("/api/admin/inquiries/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.inquiry.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 3. Admin Packages Management
-app.get("/api/admin/packages", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.package.findMany({ orderBy: { createdAt: "desc" } });
-    res.json(deserializeObj("package", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/admin/packages", authenticate, async (req, res) => {
-  try {
-    const data = serializeObj("package", req.body);
-    const result = await prisma.package.create({ data });
-    res.json(deserializeObj("package", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/api/admin/packages/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const data = serializeObj("package", req.body);
-    const result = await prisma.package.update({ where: { id }, data });
-    res.json(deserializeObj("package", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete("/api/admin/packages/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.package.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 4. Admin Destinations Management
-app.get("/api/admin/destinations", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.destination.findMany({ orderBy: { sortOrder: "asc" } });
-    res.json(deserializeObj("destination", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/admin/destinations", authenticate, async (req, res) => {
-  try {
-    const data = serializeObj("destination", req.body);
-    const result = await prisma.destination.create({ data });
-    res.json(deserializeObj("destination", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/api/admin/destinations/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const data = serializeObj("destination", req.body);
-    const result = await prisma.destination.update({ where: { id }, data });
-    res.json(deserializeObj("destination", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete("/api/admin/destinations/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.destination.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 5. Admin Blogs Management
-app.get("/api/admin/blogs", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.blog.findMany({ orderBy: { createdAt: "desc" } });
-    res.json(deserializeObj("blog", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/admin/blogs", authenticate, async (req, res) => {
-  try {
-    const data = serializeObj("blog", req.body);
-    if (data.publishedAt) data.publishedAt = new Date(data.publishedAt);
-    const result = await prisma.blog.create({ data });
-    res.json(deserializeObj("blog", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/api/admin/blogs/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const data = serializeObj("blog", req.body);
-    if (data.publishedAt) data.publishedAt = new Date(data.publishedAt);
-    const result = await prisma.blog.update({ where: { id }, data });
-    res.json(deserializeObj("blog", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete("/api/admin/blogs/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.blog.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 6. Admin Testimonials Management
-app.get("/api/admin/testimonials", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.testimonial.findMany({ orderBy: { createdAt: "desc" } });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/admin/testimonials", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.testimonial.create({ data: req.body });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/api/admin/testimonials/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await prisma.testimonial.update({ where: { id }, data: req.body });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete("/api/admin/testimonials/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.testimonial.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 7. Admin Activities Management
-app.get("/api/admin/activities", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.activity.findMany({ orderBy: { sortOrder: "asc" } });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/admin/activities", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.activity.create({ data: req.body });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/api/admin/activities/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await prisma.activity.update({ where: { id }, data: req.body });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete("/api/admin/activities/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.activity.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 8. Admin Cab Management
-app.get("/api/admin/cab/vehicles", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.cabVehicle.findMany({ orderBy: { createdAt: "desc" } });
-    res.json(deserializeObj("cabVehicle", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/admin/cab/vehicles", authenticate, async (req, res) => {
-  try {
-    const data = serializeObj("cabVehicle", req.body);
-    const result = await prisma.cabVehicle.create({ data });
-    res.json(deserializeObj("cabVehicle", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/api/admin/cab/vehicles/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const data = serializeObj("cabVehicle", req.body);
-    const result = await prisma.cabVehicle.update({ where: { id }, data });
-    res.json(deserializeObj("cabVehicle", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete("/api/admin/cab/vehicles/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.cabVehicle.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get("/api/admin/cab/routes", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.cabRoute.findMany({ orderBy: { createdAt: "desc" } });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/admin/cab/routes", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.cabRoute.create({ data: req.body });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/api/admin/cab/routes/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await prisma.cabRoute.update({ where: { id }, data: req.body });
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete("/api/admin/cab/routes/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.cabRoute.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 9. Admin Settings Management
-app.post("/api/admin/settings", authenticate, async (req, res) => {
-  try {
-    const data = req.body;
-    const ops = Object.entries(data).map(([key, value]) =>
-      prisma.siteSetting.upsert({
+    const data = req.body || {};
+    const ops = Object.entries(data).map(([key, value]) => ({
+      model: "siteSetting",
+      action: "upsert",
+      args: {
         where: { key },
         update: { value: String(value) },
         create: { key, value: String(value) },
-      })
+      },
+    }));
+    transaction(ops);
+    ok(res, { success: true });
+  } catch (e) { fail(res, e); }
+});
+
+// =========================================================================
+// UNIVERSAL PRISMA-STYLE RPC (kept for the frontend's lib/prisma.ts proxy)
+// =========================================================================
+
+app.post("/api/prisma", authenticate, (req, res) => {
+  const { model, action, args = [] } = req.body || {};
+  try {
+    const result = run(model, action, args);
+    ok(res, { data: result });
+  } catch (e) { fail(res, e); }
+});
+
+app.post("/api/prisma/transaction", authenticate, (req, res) => {
+  const { operations = [] } = req.body || {};
+  try {
+    const data = transaction(
+      operations.map((op) => ({
+        model: op.model,
+        action: op.action,
+        args: Array.isArray(op.args) ? op.args[0] : op.args,
+      }))
     );
-    await prisma.$transaction(ops);
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    ok(res, { data });
+  } catch (e) { fail(res, e); }
 });
 
-// 10. Admin Internal Pages Management
-app.get("/api/admin/internal-pages", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.internalPage.findMany({ orderBy: { sortOrder: "asc" } });
-    res.json(deserializeObj("internalPage", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/admin/internal-pages", authenticate, async (req, res) => {
-  try {
-    const result = await prisma.internalPage.create({ data: req.body });
-    res.json(deserializeObj("internalPage", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.put("/api/admin/internal-pages/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await prisma.internalPage.update({ where: { id }, data: req.body });
-    res.json(deserializeObj("internalPage", result));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.delete("/api/admin/internal-pages/:id", authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await prisma.internalPage.delete({ where: { id } });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Universal Prisma RPC endpoint as fallback
-app.post("/api/prisma", authenticate, async (req, res) => {
-  const { model, action, args = [] } = req.body;
-  try {
-    const result = await prisma[model][action](...serializeObj(model, args));
-    res.json({ data: deserializeObj(model, result) });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/api/prisma/transaction", authenticate, async (req, res) => {
-  const { operations = [] } = req.body;
-  try {
-    const result = await prisma.$transaction(
-      operations.map((op) => prisma[op.model][op.action](...serializeObj(op.model, op.args)))
-    );
-    res.json({ data: result.map((item, index) => deserializeObj(operations[index].model, item)) });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// ─── Start ─────────────────────────────────────────────────────────────
 
 app.listen(PORT, () => {
-  console.log(`🚀 SQLite REST Backend Server is live on port ${PORT}`);
-  console.log(`📂 SQLite dev.db is managed inside server/prisma directory`);
+  console.log(`🚀 SQLite REST backend live on :${PORT}`);
 });
