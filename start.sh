@@ -1,18 +1,9 @@
 #!/bin/sh
 set -e
 
-# SQLite file lives in db/dev.db inside the project. Render's app
-# filesystem is writable for the instance lifetime.
-mkdir -p ./db
-
-# Run the seed on every boot. It's entirely upserts so it's idempotent
-# and fast (<1s for the full dataset). This avoids "the .seeded marker
-# said we're done but the DB is actually empty" situations on Render
-# free tier, where the container is rebuilt between deploys but a
-# stale marker can occasionally survive in a layer.
-echo "🌱 Seeding SQLite database..."
-node db/seed.js
-echo "✅ seed complete."
-
+# DB lives on Turso when TURSO_DATABASE_URL is set, otherwise in db/dev.db.
+# The Node server itself runs autoSeedIfEmpty() on boot — when the
+# destinations table is empty, it seeds automatically. So start.sh no
+# longer needs to manage the seed.
 echo "🚀 Starting API..."
-node src/index.js
+exec node src/index.js

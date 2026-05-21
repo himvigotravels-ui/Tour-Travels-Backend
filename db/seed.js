@@ -262,7 +262,7 @@ export async function seed() {
   if (backup?.admin_users) {
     console.log(`👤 admin users (${backup.admin_users.length})...`);
     for (const a of backup.admin_users) {
-      run("adminUser", "upsert", {
+      await run("adminUser", "upsert", {
         where: { email: a.email },
         update: { password: a.password },
         create: {
@@ -283,7 +283,7 @@ export async function seed() {
         isActive: !!d.isActive, sortOrder: d.sortOrder ?? 0,
         metaTitle: d.metaTitle, metaDescription: d.metaDescription, metaKeywords: d.metaKeywords,
       };
-      run("destination", "upsert", {
+      await run("destination", "upsert", {
         where: { slug: d.slug },
         update: data,
         create: {
@@ -307,7 +307,7 @@ export async function seed() {
         isFeatured: !!p.isFeatured, isActive: !!p.isActive, isTrek: !!p.isTrek,
         metaTitle: p.metaTitle, metaDescription: p.metaDescription, metaKeywords: p.metaKeywords,
       };
-      run("package", "upsert", {
+      await run("package", "upsert", {
         where: { slug: p.slug },
         update: data,
         create: {
@@ -322,7 +322,7 @@ export async function seed() {
   console.log(`🥾 trek packages (${TREK_PACKAGES.length})...`);
   for (const t of TREK_PACKAGES) {
     const data = { ...t, isFeatured: !!t.isFeatured, isActive: true, isTrek: true };
-    run("package", "upsert", { where: { slug: t.slug }, update: data, create: data });
+    await run("package", "upsert", { where: { slug: t.slug }, update: data, create: data });
   }
 
   if (backup?.blogs) {
@@ -335,7 +335,7 @@ export async function seed() {
         publishedAt: toDateOrNull(b.publishedAt),
         metaTitle: b.metaTitle, metaDescription: b.metaDescription, metaKeywords: b.metaKeywords,
       };
-      run("blog", "upsert", {
+      await run("blog", "upsert", {
         where: { slug: b.slug },
         update: data,
         create: {
@@ -350,15 +350,15 @@ export async function seed() {
   if (backup?.testimonials) {
     console.log(`💬 testimonials (${backup.testimonials.length})...`);
     for (const t of backup.testimonials) {
-      const existing = run("testimonial", "findFirst", {
+      const existing = await run("testimonial", "findFirst", {
         where: { name: t.name, packageName: t.packageName },
       });
       const data = {
         name: t.name, text: t.text, packageName: t.packageName,
         rating: t.rating, isActive: !!t.isActive,
       };
-      if (existing) run("testimonial", "update", { where: { id: existing.id }, data });
-      else run("testimonial", "create", {
+      if (existing) await run("testimonial", "update", { where: { id: existing.id }, data });
+      else await run("testimonial", "create", {
         data: {
           id: t.id, ...data,
           createdAt: toDateOrNull(t.createdAt) || new Date(),
@@ -371,13 +371,13 @@ export async function seed() {
   if (backup?.activities) {
     console.log(`🧗 activities (${backup.activities.length})...`);
     for (const a of backup.activities) {
-      const existing = run("activity", "findFirst", { where: { title: a.title } });
+      const existing = await run("activity", "findFirst", { where: { title: a.title } });
       const data = {
         title: a.title, description: a.description, image: a.image, location: a.location,
         icon: a.icon, isActive: !!a.isActive, sortOrder: a.sortOrder ?? 0,
       };
-      if (existing) run("activity", "update", { where: { id: existing.id }, data });
-      else run("activity", "create", {
+      if (existing) await run("activity", "update", { where: { id: existing.id }, data });
+      else await run("activity", "create", {
         data: {
           id: a.id, ...data,
           createdAt: toDateOrNull(a.createdAt) || new Date(),
@@ -390,13 +390,13 @@ export async function seed() {
   if (backup?.cab_vehicles) {
     console.log(`🚗 cab vehicles (${backup.cab_vehicles.length})...`);
     for (const v of backup.cab_vehicles) {
-      const existing = run("cabVehicle", "findFirst", { where: { name: v.name } });
+      const existing = await run("cabVehicle", "findFirst", { where: { name: v.name } });
       const data = {
         name: v.name, model: v.model, capacity: v.capacity, ideal: v.ideal,
         features: v.features || [], image: v.image, isActive: !!v.isActive,
       };
-      if (existing) run("cabVehicle", "update", { where: { id: existing.id }, data });
-      else run("cabVehicle", "create", {
+      if (existing) await run("cabVehicle", "update", { where: { id: existing.id }, data });
+      else await run("cabVehicle", "create", {
         data: {
           id: v.id, ...data,
           createdAt: toDateOrNull(v.createdAt) || new Date(),
@@ -409,15 +409,15 @@ export async function seed() {
   if (backup?.cab_routes) {
     console.log(`🗺️  cab routes (${backup.cab_routes.length})...`);
     for (const r of backup.cab_routes) {
-      const existing = run("cabRoute", "findFirst", {
+      const existing = await run("cabRoute", "findFirst", {
         where: { fromCity: r.fromCity, toCity: r.toCity },
       });
       const data = {
         fromCity: r.fromCity, toCity: r.toCity, price: r.price,
         duration: r.duration, isActive: !!r.isActive,
       };
-      if (existing) run("cabRoute", "update", { where: { id: existing.id }, data });
-      else run("cabRoute", "create", {
+      if (existing) await run("cabRoute", "update", { where: { id: existing.id }, data });
+      else await run("cabRoute", "create", {
         data: {
           id: r.id, ...data,
           createdAt: toDateOrNull(r.createdAt) || new Date(),
@@ -430,7 +430,7 @@ export async function seed() {
   if (backup?.site_settings) {
     console.log(`⚙️  site settings (${backup.site_settings.length})...`);
     for (const s of backup.site_settings) {
-      run("siteSetting", "upsert", {
+      await run("siteSetting", "upsert", {
         where: { key: s.key },
         update: { value: String(s.value) },
         create: { id: s.id, key: s.key, value: String(s.value) },
@@ -441,9 +441,9 @@ export async function seed() {
   if (backup?.inquiries) {
     console.log(`📩 inquiries (${backup.inquiries.length})...`);
     for (const i of backup.inquiries) {
-      const existing = run("inquiry", "findFirst", { where: { id: i.id } });
+      const existing = await run("inquiry", "findFirst", { where: { id: i.id } });
       if (existing) continue;
-      run("inquiry", "create", {
+      await run("inquiry", "create", {
         data: {
           id: i.id, name: i.name, phone: i.phone,
           fromCity: i.fromCity, toCity: i.toCity,
@@ -465,7 +465,7 @@ export async function seed() {
   // engines, so we overwrite content but never change the slug.
   console.log(`🏔️  enriching ${ENRICHED_DESTINATIONS.length} destinations with Himachal content...`);
   for (const d of ENRICHED_DESTINATIONS) {
-    run("destination", "upsert", {
+    await run("destination", "upsert", {
       where: { slug: d.slug },
       update: d,
       create: d,
@@ -474,7 +474,7 @@ export async function seed() {
 
   console.log(`🎒 seeding ${REGION_PACKAGES.length} region-anchored packages...`);
   for (const p of REGION_PACKAGES) {
-    run("package", "upsert", {
+    await run("package", "upsert", {
       where: { slug: p.slug },
       update: p,
       create: p,
@@ -484,18 +484,20 @@ export async function seed() {
   console.log("📑 nav groups (package + trek types)...");
   for (const g of PACKAGE_NAV_GROUPS) {
     const data = { title: g.title, slug: g.slug, type: "package", sortOrder: g.sortOrder, tagline: g.tagline, isActive: true };
-    run("internalPage", "upsert", { where: { slug: g.slug }, update: data, create: data });
+    await run("internalPage", "upsert", { where: { slug: g.slug }, update: data, create: data });
   }
   for (const g of TREK_NAV_GROUPS) {
-    const dests = g.destinationSlugs
-      .map((slug) => run("destination", "findFirst", { where: { slug } }))
-      .filter(Boolean);
+    const dests = [];
+    for (const slug of g.destinationSlugs) {
+      const d = await run("destination", "findFirst", { where: { slug } });
+      if (d) dests.push(d);
+    }
 
     const baseData = {
       title: g.title, slug: g.slug, type: "trek",
       sortOrder: g.sortOrder, tagline: g.tagline, isActive: true,
     };
-    run("internalPage", "upsert", {
+    await run("internalPage", "upsert", {
       where: { slug: g.slug },
       update: { ...baseData, destinations: { set: dests.map((d) => ({ id: d.id })) } },
       create: { ...baseData, destinations: { connect: dests.map((d) => ({ id: d.id })) } },

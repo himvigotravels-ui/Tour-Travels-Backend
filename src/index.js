@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import "./db.js"; // initialise SQLite + apply schema
+import "./db.js"; // initialise libsql + apply schema
 import { run, transaction } from "./query.js";
 
 dotenv.config();
@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 
-// ─── Auth middleware (for writing / admin endpoints) ───────────────────
+// ─── Auth ──────────────────────────────────────────────────────────────
 
 const EXPECTED_SECRET =
   process.env.API_SECRET_KEY || "himvigo-super-secret-key-2026";
@@ -28,8 +28,6 @@ function authenticate(req, res, next) {
   next();
 }
 
-// ─── Tiny helpers ──────────────────────────────────────────────────────
-
 const ok = (res, data) => res.json(data);
 const fail = (res, err) => {
   console.error(err);
@@ -38,27 +36,26 @@ const fail = (res, err) => {
 
 // ─── Health & root ─────────────────────────────────────────────────────
 
-app.get("/", (_req, res) => res.send("Tour & Travels SQLite API Server is running."));
+app.get("/", (_req, res) => res.send("Tour & Travels libsql API Server is running."));
 app.get("/health", (_req, res) =>
-  res.json({ status: "healthy", database: "sqlite", timestamp: new Date() })
+  res.json({ status: "healthy", database: process.env.TURSO_DATABASE_URL ? "turso" : "sqlite", timestamp: new Date() })
 );
 
 // =========================================================================
 // PUBLIC ENDPOINTS
 // =========================================================================
 
-// Destinations
-app.get("/api/destinations", (req, res) => {
+app.get("/api/destinations", async (req, res) => {
   try {
     const { active } = req.query;
     const where = {};
     if (active === "true" || active === undefined) where.isActive = true;
-    ok(res, run("destination", "findMany", { where, orderBy: { sortOrder: "asc" } }));
+    ok(res, await run("destination", "findMany", { where, orderBy: { sortOrder: "asc" } }));
   } catch (e) { fail(res, e); }
 });
-app.get("/api/destinations/:slug", (req, res) => {
+app.get("/api/destinations/:slug", async (req, res) => {
   try {
-    const row = run("destination", "findFirst", {
+    const row = await run("destination", "findFirst", {
       where: { slug: req.params.slug, isActive: true },
     });
     if (!row) return res.status(404).json({ error: "Destination not found" });
@@ -66,8 +63,7 @@ app.get("/api/destinations/:slug", (req, res) => {
   } catch (e) { fail(res, e); }
 });
 
-// Packages
-app.get("/api/packages", (req, res) => {
+app.get("/api/packages", async (req, res) => {
   try {
     const { featured, active, category, limit } = req.query;
     const where = {};
@@ -75,90 +71,83 @@ app.get("/api/packages", (req, res) => {
     if (featured === "true") where.isFeatured = true;
     const opts = { where, orderBy: { createdAt: "desc" } };
     if (limit) opts.take = parseInt(limit, 10);
-    let rows = run("package", "findMany", opts);
+    let rows = await run("package", "findMany", opts);
     if (category) {
-      rows = rows.filter(
-        (p) => Array.isArray(p.categories) && p.categories.includes(category)
-      );
+      rows = rows.filter((p) => Array.isArray(p.categories) && p.categories.includes(category));
     }
     ok(res, rows);
   } catch (e) { fail(res, e); }
 });
-app.get("/api/packages/:slug", (req, res) => {
+app.get("/api/packages/:slug", async (req, res) => {
   try {
-    const row = run("package", "findFirst", { where: { slug: req.params.slug } });
+    const row = await run("package", "findFirst", { where: { slug: req.params.slug } });
     if (!row) return res.status(404).json({ error: "Package not found" });
     ok(res, row);
   } catch (e) { fail(res, e); }
 });
 
-// Blogs
-app.get("/api/blogs", (req, res) => {
+app.get("/api/blogs", async (req, res) => {
   try {
     const { published, limit } = req.query;
     const where = {};
     if (published === "true" || published === undefined) where.isPublished = true;
     const opts = { where, orderBy: { publishedAt: "desc" } };
     if (limit) opts.take = parseInt(limit, 10);
-    ok(res, run("blog", "findMany", opts));
+    ok(res, await run("blog", "findMany", opts));
   } catch (e) { fail(res, e); }
 });
-app.get("/api/blogs/:slug", (req, res) => {
+app.get("/api/blogs/:slug", async (req, res) => {
   try {
-    const row = run("blog", "findFirst", { where: { slug: req.params.slug } });
+    const row = await run("blog", "findFirst", { where: { slug: req.params.slug } });
     if (!row) return res.status(404).json({ error: "Blog not found" });
     ok(res, row);
   } catch (e) { fail(res, e); }
 });
 
-// Cab
-app.get("/api/cab/vehicles", (_req, res) => {
+app.get("/api/cab/vehicles", async (_req, res) => {
   try {
-    ok(res, run("cabVehicle", "findMany", {
+    ok(res, await run("cabVehicle", "findMany", {
       where: { isActive: true },
       orderBy: { updatedAt: "desc" },
     }));
   } catch (e) { fail(res, e); }
 });
-app.get("/api/cab/routes", (_req, res) => {
+app.get("/api/cab/routes", async (_req, res) => {
   try {
-    ok(res, run("cabRoute", "findMany", {
+    ok(res, await run("cabRoute", "findMany", {
       where: { isActive: true },
       orderBy: { fromCity: "asc" },
     }));
   } catch (e) { fail(res, e); }
 });
 
-// Settings
-app.get("/api/settings", (_req, res) => {
+app.get("/api/settings", async (_req, res) => {
   try {
-    const rows = run("siteSetting", "findMany", {});
+    const rows = await run("siteSetting", "findMany", {});
     const obj = {};
     for (const s of rows) obj[s.key] = s.value;
     ok(res, obj);
   } catch (e) { fail(res, e); }
 });
-app.get("/api/settings/:key", (req, res) => {
+app.get("/api/settings/:key", async (req, res) => {
   try {
-    const row = run("siteSetting", "findFirst", { where: { key: req.params.key } });
+    const row = await run("siteSetting", "findFirst", { where: { key: req.params.key } });
     ok(res, { value: row?.value || "" });
   } catch (e) { fail(res, e); }
 });
 
-// Testimonials / Activities
-app.get("/api/testimonials", (_req, res) => {
-  try { ok(res, run("testimonial", "findMany", { orderBy: { createdAt: "desc" } })); }
+app.get("/api/testimonials", async (_req, res) => {
+  try { ok(res, await run("testimonial", "findMany", { orderBy: { createdAt: "desc" } })); }
   catch (e) { fail(res, e); }
 });
-app.get("/api/activities", (_req, res) => {
-  try { ok(res, run("activity", "findMany", { orderBy: { sortOrder: "asc" } })); }
+app.get("/api/activities", async (_req, res) => {
+  try { ok(res, await run("activity", "findMany", { orderBy: { sortOrder: "asc" } })); }
   catch (e) { fail(res, e); }
 });
 
-// Internal pages (nav-groups)
-app.get("/api/internal-pages", (_req, res) => {
+app.get("/api/internal-pages", async (_req, res) => {
   try {
-    ok(res, run("internalPage", "findMany", {
+    ok(res, await run("internalPage", "findMany", {
       where: { isActive: true },
       orderBy: { sortOrder: "asc" },
       include: {
@@ -168,9 +157,9 @@ app.get("/api/internal-pages", (_req, res) => {
     }));
   } catch (e) { fail(res, e); }
 });
-app.get("/api/internal-pages/:slug", (req, res) => {
+app.get("/api/internal-pages/:slug", async (req, res) => {
   try {
-    const row = run("internalPage", "findFirst", {
+    const row = await run("internalPage", "findFirst", {
       where: { slug: req.params.slug },
       include: { packages: true, destinations: true },
     });
@@ -179,11 +168,10 @@ app.get("/api/internal-pages/:slug", (req, res) => {
   } catch (e) { fail(res, e); }
 });
 
-// Inquiries (public form submission)
-app.post("/api/inquiries", (req, res) => {
+app.post("/api/inquiries", async (req, res) => {
   try {
     const d = req.body || {};
-    const row = run("inquiry", "create", {
+    const row = await run("inquiry", "create", {
       data: {
         name: d.name,
         phone: d.phone,
@@ -208,37 +196,33 @@ app.post("/api/inquiries", (req, res) => {
 });
 
 // =========================================================================
-// ADMIN ENDPOINTS (authenticated)
+// ADMIN ENDPOINTS
 // =========================================================================
 
-// Login
-app.post("/api/admin/login", authenticate, (req, res) => {
+app.post("/api/admin/login", authenticate, async (req, res) => {
   try {
-    const row = run("adminUser", "findFirst", { where: { email: req.body?.email } });
-    ok(res, row);
+    ok(res, await run("adminUser", "findFirst", { where: { email: req.body?.email } }));
   } catch (e) { fail(res, e); }
 });
 
-// A small factory to wire CRUD endpoints for a model with consistent
-// shape. Keeps the file short and the routes uniform.
 function crud(prefix, model, opts = {}) {
   const listOrder = opts.orderBy || { createdAt: "desc" };
 
-  app.get(`/api/admin/${prefix}`, authenticate, (_req, res) => {
-    try { ok(res, run(model, "findMany", { orderBy: listOrder })); }
+  app.get(`/api/admin/${prefix}`, authenticate, async (_req, res) => {
+    try { ok(res, await run(model, "findMany", { orderBy: listOrder })); }
     catch (e) { fail(res, e); }
   });
-  app.post(`/api/admin/${prefix}`, authenticate, (req, res) => {
-    try { ok(res, run(model, "create", { data: req.body })); }
+  app.post(`/api/admin/${prefix}`, authenticate, async (req, res) => {
+    try { ok(res, await run(model, "create", { data: req.body })); }
     catch (e) { fail(res, e); }
   });
-  app.put(`/api/admin/${prefix}/:id`, authenticate, (req, res) => {
-    try { ok(res, run(model, "update", { where: { id: req.params.id }, data: req.body })); }
+  app.put(`/api/admin/${prefix}/:id`, authenticate, async (req, res) => {
+    try { ok(res, await run(model, "update", { where: { id: req.params.id }, data: req.body })); }
     catch (e) { fail(res, e); }
   });
-  app.delete(`/api/admin/${prefix}/:id`, authenticate, (req, res) => {
+  app.delete(`/api/admin/${prefix}/:id`, authenticate, async (req, res) => {
     try {
-      run(model, "delete", { where: { id: req.params.id } });
+      await run(model, "delete", { where: { id: req.params.id } });
       ok(res, { success: true });
     } catch (e) { fail(res, e); }
   });
@@ -254,8 +238,7 @@ crud("cab/vehicles",  "cabVehicle",  { orderBy: { createdAt: "desc" } });
 crud("cab/routes",    "cabRoute",    { orderBy: { createdAt: "desc" } });
 crud("internal-pages","internalPage",{ orderBy: { sortOrder: "asc" } });
 
-// Settings (upsert each key/value)
-app.post("/api/admin/settings", authenticate, (req, res) => {
+app.post("/api/admin/settings", authenticate, async (req, res) => {
   try {
     const data = req.body || {};
     const ops = Object.entries(data).map(([key, value]) => ({
@@ -267,26 +250,23 @@ app.post("/api/admin/settings", authenticate, (req, res) => {
         create: { key, value: String(value) },
       },
     }));
-    transaction(ops);
+    await transaction(ops);
     ok(res, { success: true });
   } catch (e) { fail(res, e); }
 });
 
-// Manual reseed trigger. Useful when the on-boot seed got skipped or
-// the DB lost data on a Render restart. Idempotent (the seed only does
-// upserts) so it's safe to call as often as you like.
 app.post("/api/admin/reseed", authenticate, async (_req, res) => {
   try {
-    const before = run("destination", "count", {});
+    const before = await run("destination", "count", {});
     const mod = await import("../db/seed.js?ts=" + Date.now());
     if (mod.seed) await mod.seed();
     const after = {
-      destinations: run("destination", "count", {}),
-      packages: run("package", "count", {}),
-      packagesTrek: run("package", "count", { where: { isTrek: true } }),
-      blogs: run("blog", "count", {}),
-      siteSettings: run("siteSetting", "count", {}),
-      internalPages: run("internalPage", "count", {}),
+      destinations: await run("destination", "count", {}),
+      packages: await run("package", "count", {}),
+      packagesTrek: await run("package", "count", { where: { isTrek: true } }),
+      blogs: await run("blog", "count", {}),
+      siteSettings: await run("siteSetting", "count", {}),
+      internalPages: await run("internalPage", "count", {}),
     };
     ok(res, { reseeded: true, destinationsBefore: before, after });
   } catch (e) {
@@ -296,21 +276,21 @@ app.post("/api/admin/reseed", authenticate, async (_req, res) => {
 });
 
 // =========================================================================
-// UNIVERSAL PRISMA-STYLE RPC (kept for the frontend's lib/prisma.ts proxy)
+// UNIVERSAL PRISMA-STYLE RPC (frontend's lib/prisma.ts proxy)
 // =========================================================================
 
-app.post("/api/prisma", authenticate, (req, res) => {
+app.post("/api/prisma", authenticate, async (req, res) => {
   const { model, action, args = [] } = req.body || {};
   try {
-    const result = run(model, action, args);
+    const result = await run(model, action, args);
     ok(res, { data: result });
   } catch (e) { fail(res, e); }
 });
 
-app.post("/api/prisma/transaction", authenticate, (req, res) => {
+app.post("/api/prisma/transaction", authenticate, async (req, res) => {
   const { operations = [] } = req.body || {};
   try {
-    const data = transaction(
+    const data = await transaction(
       operations.map((op) => ({
         model: op.model,
         action: op.action,
@@ -322,29 +302,24 @@ app.post("/api/prisma/transaction", authenticate, (req, res) => {
 });
 
 // ─── Auto-seed on empty DB ─────────────────────────────────────────────
-// Render free tier wipes the ephemeral filesystem between spin-downs and
-// the start.sh seed sometimes doesn't run on re-spin. Belt-and-braces:
-// check the destinations count at boot and run the seed if empty. Seed
-// is fully idempotent (all upserts) so this is safe at any moment.
+
 async function autoSeedIfEmpty() {
   try {
-    const count = run("destination", "count", {});
-    if (count === 0) {
-      console.log("🌱 destinations table empty — running seed...");
+    const c = await run("destination", "count", {});
+    if (c === 0) {
+      console.log("🌱 destinations empty — running seed...");
       const mod = await import("../db/seed.js?ts=" + Date.now());
       if (mod.seed) await mod.seed();
       console.log("✅ auto-seed complete.");
     } else {
-      console.log(`📦 DB already populated (${count} destinations).`);
+      console.log(`📦 DB already populated (${c} destinations).`);
     }
   } catch (e) {
     console.error("❌ auto-seed check failed:", e.message);
   }
 }
 
-// ─── Start ─────────────────────────────────────────────────────────────
-
 app.listen(PORT, async () => {
-  console.log(`🚀 SQLite REST backend live on :${PORT}`);
+  console.log(`🚀 libsql REST backend live on :${PORT}`);
   await autoSeedIfEmpty();
 });

@@ -10,8 +10,10 @@ services:
         value: 3001
       - key: API_SECRET_KEY
         value: himvigo-super-secret-key-2026
-      # SQLite file lives in db/dev.db inside the app directory. Ephemeral
-      # on Render free tier (resets on redeploy) — fine because start.sh
-      # re-seeds whenever the .seeded marker is absent.
-      - key: DATABASE_FILE
-        value: ./db/dev.db
+      # Turso (libsql) — the URL is non-sensitive; the auth token is.
+      # Set TURSO_AUTH_TOKEN via Render dashboard → Environment (NOT in
+      # this file), so it never lands in git.
+      - key: TURSO_DATABASE_URL
+        value: libsql://himvigo-himvigo.aws-ap-south-1.turso.io
+      - key: TURSO_AUTH_TOKEN
+        sync: false
