@@ -14,35 +14,71 @@
 const u = (id) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
 
-const IMG = {
-  // ── Destinations (all IDs verified to resolve 200 on Unsplash) ────
-  manali:      u("photo-1626621331169-5f34be280ed9"), // Spiti-style mountain
-  shimla:      u("photo-1626248801379-51a0748a5f96"), // misty hill town
-  spiti:       u("photo-1473625247510-8ceb1760943f"), // monastery / Tibet
-  kasol:       u("photo-1593115057322-e94b77572f20"), // pine forest valley
-  dharamshala: u("photo-1544735716-392fe2489ffa"),   // Triund meadow ridge
-  kinnaur:     u("photo-1542401886-65d6c61db217"),   // Kinner range
-  dalhousie:   u("photo-1502082553048-f009c37129b9"), // alpine meadow
-  kalpa:       u("photo-1568702846914-96b305d2aaeb"), // apple orchard
-  sangla:      u("photo-1464822759023-fed622ff2c3b"), // river valley
-  chitkul:     u("photo-1542401886-65d6c61db217"),   // mountain village
-  pathankot:   u("photo-1518998053901-5348d3961a04"), // train / journey
-  amritsar:    u("photo-1518998053901-5348d3961a04"), // journey
-  ladakh:      u("photo-1454496522488-7a8e488e8606"), // high mountain road
-
-  // ── Activities & hero scenes (verified 200) ───────────────────────
-  solang:      u("photo-1551524559-8af4e6624178"),   // snow / ski
-  ridge:       u("photo-1626248801379-51a0748a5f96"), // Shimla scene
-  monastery:   u("photo-1473625247510-8ceb1760943f"), // monastery
-  parvati:     u("photo-1464822759023-fed622ff2c3b"), // river valley
-  triund:      u("photo-1544735716-392fe2489ffa"),   // Triund meadow
-  paragliding: u("photo-1614977645540-7abd88ba8e56"), // mountain panorama
-  apple:       u("photo-1568702846914-96b305d2aaeb"), // apple orchard
-  khajjiar:    u("photo-1502082553048-f009c37129b9"), // meadow
-  road:        u("photo-1454496522488-7a8e488e8606"), // high road
-  camp:        u("photo-1504280390367-361c6d9f38f4"), // camping
-  tempo:       u("photo-1544620347-c4fd4a3d5957"),   // travel vehicle
+// 30 verified-working Himalayan / mountain Unsplash photo IDs. The
+// curated pool below intentionally avoids reuse so every destination
+// and every package can pick a distinct image.
+const POOL = {
+  spitiValley:      u("photo-1626621331169-5f34be280ed9"),
+  shimlaWinter:     u("photo-1626248801379-51a0748a5f96"),
+  monasteryTibet:   u("photo-1473625247510-8ceb1760943f"),
+  pineValley:       u("photo-1593115057322-e94b77572f20"),
+  triundMeadow:     u("photo-1544735716-392fe2489ffa"),
+  kinnerRange:      u("photo-1542401886-65d6c61db217"),
+  alpineMeadow:     u("photo-1502082553048-f009c37129b9"),
+  appleOrchard:     u("photo-1568702846914-96b305d2aaeb"),
+  riverValley:      u("photo-1464822759023-fed622ff2c3b"),
+  trainJourney:     u("photo-1518998053901-5348d3961a04"),
+  highMountainRoad: u("photo-1454496522488-7a8e488e8606"),
+  snowSki:          u("photo-1551524559-8af4e6624178"),
+  panoramicRidge:   u("photo-1614977645540-7abd88ba8e56"),
+  beasValley:       u("photo-1506197603052-3cc9c3a201bd"),
+  colonialHills:    u("photo-1605649487212-47bdab064df7"),
+  coldDesert:       u("photo-1518602164578-cd0074062767"),
+  snowyPeaks:       u("photo-1455156218388-5e61b526818b"),
+  trekGear:         u("photo-1551632811-561732d1e306"),
+  himalayaSunset:   u("photo-1565182999561-18d7dc61c393"),
+  glacialLake:      u("photo-1486870591958-9b9d0d1dda99"),
+  duskMountains:    u("photo-1493514789931-586cb221d7a7"),
+  cloudPeaks:       u("photo-1500534314209-a25ddb2bd429"),
+  starryNight:      u("photo-1480497490787-505ec076689f"),
+  mountainHiker:    u("photo-1455218873509-8097305ee378"),
+  ridgeWalk:        u("photo-1483728642387-6c3bdd6c93e5"),
+  mistyForest:      u("photo-1502943693086-33b5b1cfdf2f"),
+  himalayaRange:    u("photo-1485470733090-0aae1788d5af"),
+  campfire:         u("photo-1469854523086-cc02fe5d8800"),
+  campTent:         u("photo-1504280390367-361c6d9f38f4"),
+  travelVan:        u("photo-1544620347-c4fd4a3d5957"),
 };
+
+// Backward-compat alias names used elsewhere in this file & seed.js.
+const IMG = {
+  manali:      POOL.beasValley,
+  shimla:      POOL.colonialHills,
+  spiti:       POOL.coldDesert,
+  spitiValley: POOL.spitiValley,
+  kasol:       POOL.pineValley,
+  dharamshala: POOL.triundMeadow,
+  kinnaur:     POOL.kinnerRange,
+  dalhousie:   POOL.alpineMeadow,
+  kalpa:       POOL.appleOrchard,
+  sangla:      POOL.riverValley,
+  chitkul:     POOL.duskMountains,
+  pathankot:   POOL.trainJourney,
+  amritsar:    POOL.ridgeWalk,
+  ladakh:      POOL.highMountainRoad,
+  solang:      POOL.snowSki,
+  ridge:       POOL.shimlaWinter,
+  monastery:   POOL.monasteryTibet,
+  parvati:     POOL.riverValley,
+  triund:      POOL.triundMeadow,
+  paragliding: POOL.panoramicRidge,
+  apple:       POOL.appleOrchard,
+  khajjiar:    POOL.alpineMeadow,
+  road:        POOL.highMountainRoad,
+  camp:        POOL.campTent,
+  tempo:       POOL.travelVan,
+};
+export { POOL };
 
 // ─── Enriched destinations ─────────────────────────────────────────────
 
@@ -56,7 +92,7 @@ export const DESTINATIONS = [
     bestTime: "October to June",
     altitude: "6,725 ft (2,050 m)",
     vibe: "Romantic, Adventure, Family",
-    image: IMG.manali,
+    image: POOL.beasValley,
     highlights: [
       "Solang Valley — paragliding, zorbing & winter ski slopes",
       "Atal Tunnel — world's longest 10,000 ft highway tunnel",
@@ -83,7 +119,7 @@ export const DESTINATIONS = [
     bestTime: "March to June, September to February",
     altitude: "7,467 ft (2,276 m)",
     vibe: "Heritage, Family, Easy mountains",
-    image: IMG.shimla,
+    image: POOL.colonialHills,
     highlights: [
       "The Ridge & Christ Church at sunset",
       "Kalka–Shimla UNESCO toy train (5-hour scenic ride)",
@@ -110,7 +146,7 @@ export const DESTINATIONS = [
     bestTime: "June to October (Manali side); year-round via Shimla",
     altitude: "12,500 ft (3,810 m) — Kaza",
     vibe: "Offbeat, Adventure, Spiritual",
-    image: IMG.spiti,
+    image: POOL.coldDesert,
     highlights: [
       "Key Monastery sunrise & Tabo (1,000-year-old fresco caves)",
       "Chandratal Lake — crescent-shaped, 14,100 ft",
@@ -137,7 +173,7 @@ export const DESTINATIONS = [
     bestTime: "June to October (loop); year-round via Shimla",
     altitude: "12,500 ft (3,810 m) — Kaza",
     vibe: "Offbeat, Adventure, Photography",
-    image: IMG.monastery,
+    image: POOL.monasteryTibet,
     highlights: [
       "Key Monastery & Tabo's mud-brick gompa",
       "Chandratal Lake camping",
@@ -162,7 +198,7 @@ export const DESTINATIONS = [
     bestTime: "March to June, September to November",
     altitude: "5,180 ft (1,580 m)",
     vibe: "Backpacker, Trek, Nature",
-    image: IMG.kasol,
+    image: POOL.pineValley,
     highlights: [
       "Kheerganga Trek — 12 km to a 9,800 ft hot spring camp",
       "Tosh village (gateway to Pin Parvati Pass)",
@@ -189,7 +225,7 @@ export const DESTINATIONS = [
     bestTime: "February to June, September to November",
     altitude: "4,780 ft (1,457 m) — McLeod Ganj",
     vibe: "Spiritual, Nature, Culture",
-    image: IMG.dharamshala,
+    image: POOL.triundMeadow,
     highlights: [
       "Triund Trek — 9 km to a 9,500 ft meadow camp",
       "Tsuglagkhang Complex (Dalai Lama's temple)",
@@ -216,7 +252,7 @@ export const DESTINATIONS = [
     bestTime: "April to October",
     altitude: "9,200 ft (2,800 m) — Kalpa",
     vibe: "Offbeat, Adventure, Photography",
-    image: IMG.kinnaur,
+    image: POOL.kinnerRange,
     highlights: [
       "Kinnaur-Kailash range views from Kalpa at sunrise",
       "Chitkul — last village before the Tibet border",
@@ -243,7 +279,7 @@ export const DESTINATIONS = [
     bestTime: "April to October (apples ripe Aug–Oct)",
     altitude: "9,200 ft (2,800 m)",
     vibe: "Offbeat, Quiet, Photography",
-    image: IMG.apple,
+    image: POOL.appleOrchard,
     highlights: [
       "Sunrise view of Kinner Kailash from the village",
       "Narayan-Nagini temple complex",
@@ -269,7 +305,7 @@ export const DESTINATIONS = [
     bestTime: "April to October",
     altitude: "8,600 ft (2,621 m)",
     vibe: "Offbeat, Nature, Photography",
-    image: IMG.sangla,
+    image: POOL.riverValley,
     highlights: [
       "Chitkul — last Indian village (22 km from Sangla)",
       "Kamru Fort & Kamakhya Devi temple",
@@ -295,7 +331,7 @@ export const DESTINATIONS = [
     bestTime: "March to June, September to October",
     altitude: "6,460 ft (1,970 m)",
     vibe: "Heritage, Family, Honeymoon",
-    image: IMG.dalhousie,
+    image: POOL.alpineMeadow,
     highlights: [
       "Khajjiar — 'Mini Switzerland of India' (22 km)",
       "St John's Church, St Patrick's & St Francis colonial churches",
@@ -322,7 +358,7 @@ export const DESTINATIONS = [
     bestTime: "Year-round (transit hub)",
     altitude: "1,036 ft (316 m)",
     vibe: "Transit, Gateway",
-    image: IMG.pathankot,
+    image: POOL.trainJourney,
     highlights: [
       "Pathankot Junction — direct overnight trains from Delhi/Mumbai",
       "3-hour onward drive to McLeod Ganj/Dharamshala",
@@ -348,7 +384,7 @@ export const DESTINATIONS = [
     bestTime: "October to March",
     altitude: "768 ft (234 m)",
     vibe: "Pilgrimage, Gateway, Food",
-    image: IMG.amritsar,
+    image: POOL.ridgeWalk,
     highlights: [
       "Harmandir Sahib (Golden Temple) & Langar",
       "Jallianwala Bagh memorial",
@@ -374,7 +410,7 @@ export const DESTINATIONS = [
     bestTime: "June to September (Manali-Leh road open)",
     altitude: "11,562 ft (3,524 m) — Leh",
     vibe: "Adventure, Offbeat, Bucket-list",
-    image: IMG.ladakh,
+    image: POOL.highMountainRoad,
     highlights: [
       "Manali-Leh highway — 5 passes, 473 km",
       "Pangong Tso (3 Idiots lake) — 14,270 ft",
@@ -406,7 +442,7 @@ export const PACKAGES = [
     pricePerPerson: 17999,
     durationDays: 5,
     durationNights: 4,
-    imageUrls: [IMG.manali, IMG.solang, IMG.parvati],
+    imageUrls: [POOL.beasValley, POOL.snowSki, POOL.himalayaSunset],
     vehicleType: "Sedan",
     maxOccupancy: 2,
     description:
@@ -442,7 +478,7 @@ export const PACKAGES = [
     pricePerPerson: 14999,
     durationDays: 6,
     durationNights: 5,
-    imageUrls: [IMG.manali, IMG.solang, IMG.tempo],
+    imageUrls: [POOL.beasValley, POOL.snowSki, POOL.travelVan],
     vehicleType: "Toyota Innova / Tempo Traveller",
     maxOccupancy: 7,
     description:
@@ -479,7 +515,7 @@ export const PACKAGES = [
     pricePerPerson: 7999,
     durationDays: 3,
     durationNights: 2,
-    imageUrls: [IMG.shimla, IMG.ridge, IMG.solang],
+    imageUrls: [POOL.colonialHills, POOL.shimlaWinter, POOL.mistyForest],
     vehicleType: "Sedan",
     maxOccupancy: 4,
     description:
@@ -506,7 +542,7 @@ export const PACKAGES = [
     pricePerPerson: 19999,
     durationDays: 7,
     durationNights: 6,
-    imageUrls: [IMG.shimla, IMG.manali, IMG.solang],
+    imageUrls: [POOL.colonialHills, POOL.beasValley, POOL.snowSki],
     vehicleType: "Sedan / Innova",
     maxOccupancy: 4,
     description:
@@ -539,7 +575,7 @@ export const PACKAGES = [
     pricePerPerson: 26999,
     durationDays: 9,
     durationNights: 8,
-    imageUrls: [IMG.spiti, IMG.monastery, IMG.road],
+    imageUrls: [POOL.coldDesert, POOL.monasteryTibet, POOL.highMountainRoad],
     vehicleType: "Tempo Traveller",
     maxOccupancy: 12,
     description:
@@ -579,7 +615,7 @@ export const PACKAGES = [
     pricePerPerson: 32999,
     durationDays: 7,
     durationNights: 6,
-    imageUrls: [IMG.spiti, IMG.monastery, IMG.camp],
+    imageUrls: [POOL.coldDesert, POOL.monasteryTibet, POOL.snowyPeaks],
     vehicleType: "SUV (4×4)",
     maxOccupancy: 5,
     description:
@@ -617,7 +653,7 @@ export const PACKAGES = [
     pricePerPerson: 5999,
     durationDays: 4,
     durationNights: 3,
-    imageUrls: [IMG.kasol, IMG.parvati, IMG.camp],
+    imageUrls: [POOL.pineValley, POOL.riverValley, POOL.mistyForest],
     vehicleType: "Volvo + Tempo",
     maxOccupancy: 14,
     description:
@@ -647,7 +683,7 @@ export const PACKAGES = [
     pricePerPerson: 8499,
     durationDays: 3,
     durationNights: 2,
-    imageUrls: [IMG.dharamshala, IMG.triund, IMG.parvati],
+    imageUrls: [POOL.triundMeadow, POOL.ridgeWalk, POOL.riverValley],
     vehicleType: "SUV",
     maxOccupancy: 6,
     description:
@@ -674,7 +710,7 @@ export const PACKAGES = [
     pricePerPerson: 7499,
     durationDays: 3,
     durationNights: 2,
-    imageUrls: [IMG.paragliding, IMG.dharamshala, IMG.camp],
+    imageUrls: [POOL.panoramicRidge, POOL.cloudPeaks, POOL.campfire],
     vehicleType: "SUV",
     maxOccupancy: 6,
     description:
@@ -703,7 +739,7 @@ export const PACKAGES = [
     pricePerPerson: 16999,
     durationDays: 6,
     durationNights: 5,
-    imageUrls: [IMG.kinnaur, IMG.sangla, IMG.chitkul],
+    imageUrls: [POOL.kinnerRange, POOL.riverValley, POOL.duskMountains],
     vehicleType: "SUV",
     maxOccupancy: 6,
     description:
@@ -735,7 +771,7 @@ export const PACKAGES = [
     pricePerPerson: 11999,
     durationDays: 4,
     durationNights: 3,
-    imageUrls: [IMG.dalhousie, IMG.khajjiar, IMG.ridge],
+    imageUrls: [POOL.alpineMeadow, POOL.mistyForest, POOL.shimlaWinter],
     vehicleType: "Sedan / Innova",
     maxOccupancy: 4,
     description:
@@ -765,7 +801,7 @@ export const PACKAGES = [
     pricePerPerson: 38999,
     durationDays: 9,
     durationNights: 8,
-    imageUrls: [IMG.ladakh, IMG.road, IMG.camp],
+    imageUrls: [POOL.highMountainRoad, POOL.himalayaRange, POOL.campTent],
     vehicleType: "SUV / Innova",
     maxOccupancy: 5,
     description:

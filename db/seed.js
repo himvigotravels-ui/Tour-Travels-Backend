@@ -8,7 +8,11 @@ import { fileURLToPath } from "node:url";
 
 import "../src/db.js"; // initialise schema
 import { run } from "../src/query.js";
-import { DESTINATIONS as ENRICHED_DESTINATIONS, PACKAGES as REGION_PACKAGES } from "./seed_content.js";
+import {
+  DESTINATIONS as ENRICHED_DESTINATIONS,
+  PACKAGES as REGION_PACKAGES,
+  POOL as IMGPOOL,
+} from "./seed_content.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -32,20 +36,21 @@ function toDateOrNull(v) {
 }
 
 // ─── Trek package definitions (Himachal-themed) ────────────────────────
+// All image URLs source from the verified-working pool in seed_content.js.
 
 const IMG = {
-  triund: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80",
-  kheerganga: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
-  hampta: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1200&q=80",
-  bhrigu: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80",
-  pinparvati: "https://images.unsplash.com/photo-1626621331169-5f34be280ed9?auto=format&fit=crop&w=1200&q=80",
-  buran: "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
-  churdhar: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1200&q=80",
-  beaskund: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?auto=format&fit=crop&w=1200&q=80",
-  indrahar: "https://images.unsplash.com/photo-1561361398-a8d3aaae9e6e?auto=format&fit=crop&w=1200&q=80",
-  chandratal: "https://images.unsplash.com/photo-1473444330585-93a48b18ba79?auto=format&fit=crop&w=1200&q=80",
-  camp: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1200&q=80",
-  trek: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1200&q=80",
+  triund: IMGPOOL.triundMeadow,
+  kheerganga: IMGPOOL.riverValley,
+  hampta: IMGPOOL.glacialLake,
+  bhrigu: IMGPOOL.trekGear,
+  pinparvati: IMGPOOL.spitiValley,
+  buran: IMGPOOL.colonialHills,
+  churdhar: IMGPOOL.mistyForest,
+  beaskund: IMGPOOL.beasValley,
+  indrahar: IMGPOOL.ridgeWalk,
+  chandratal: IMGPOOL.starryNight,
+  camp: IMGPOOL.campTent,
+  trek: IMGPOOL.mountainHiker,
 };
 
 const TREK_PACKAGES = [
@@ -323,6 +328,22 @@ export async function seed() {
   for (const t of TREK_PACKAGES) {
     const data = { ...t, isFeatured: !!t.isFeatured, isActive: true, isTrek: true };
     await run("package", "upsert", { where: { slug: t.slug }, update: data, create: data });
+  }
+
+  // Replace placeholder /images/destinations/*.png URLs that the legacy
+  // backup wrote into 5 packages with proper Himachal mountain photos.
+  const BACKUP_IMAGE_OVERRIDES = {
+    "manali-snow-retreat":      [IMGPOOL.beasValley, IMGPOOL.snowSki, IMGPOOL.snowyPeaks],
+    "spiti-valley-expedition":  [IMGPOOL.spitiValley, IMGPOOL.monasteryTibet, IMGPOOL.coldDesert],
+    "kasol-kheerganga-trek":    [IMGPOOL.pineValley, IMGPOOL.riverValley, IMGPOOL.campTent],
+    "custom-kinnaur-tour":      [IMGPOOL.kinnerRange, IMGPOOL.appleOrchard, IMGPOOL.duskMountains],
+    "shimla-manali-delight":    [IMGPOOL.colonialHills, IMGPOOL.beasValley, IMGPOOL.shimlaWinter],
+  };
+  for (const [slug, imageUrls] of Object.entries(BACKUP_IMAGE_OVERRIDES)) {
+    const exists = await run("package", "findFirst", { where: { slug } });
+    if (exists) {
+      await run("package", "update", { where: { slug }, data: { imageUrls } });
+    }
   }
 
   if (backup?.blogs) {
