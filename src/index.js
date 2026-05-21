@@ -321,8 +321,30 @@ app.post("/api/prisma/transaction", authenticate, (req, res) => {
   } catch (e) { fail(res, e); }
 });
 
+// ─── Auto-seed on empty DB ─────────────────────────────────────────────
+// Render free tier wipes the ephemeral filesystem between spin-downs and
+// the start.sh seed sometimes doesn't run on re-spin. Belt-and-braces:
+// check the destinations count at boot and run the seed if empty. Seed
+// is fully idempotent (all upserts) so this is safe at any moment.
+async function autoSeedIfEmpty() {
+  try {
+    const count = run("destination", "count", {});
+    if (count === 0) {
+      console.log("🌱 destinations table empty — running seed...");
+      const mod = await import("../db/seed.js?ts=" + Date.now());
+      if (mod.seed) await mod.seed();
+      console.log("✅ auto-seed complete.");
+    } else {
+      console.log(`📦 DB already populated (${count} destinations).`);
+    }
+  } catch (e) {
+    console.error("❌ auto-seed check failed:", e.message);
+  }
+}
+
 // ─── Start ─────────────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 SQLite REST backend live on :${PORT}`);
+  await autoSeedIfEmpty();
 });
