@@ -265,34 +265,33 @@ export async function seed() {
   const backup = loadBackup();
 
   if (backup?.admin_users) {
-    console.log(`👤 admin users (${backup.admin_users.length})...`);
+    console.log(`👤 admin users (${backup.admin_users.length}) — create-only...`);
     for (const a of backup.admin_users) {
-      await run("adminUser", "upsert", {
-        where: { email: a.email },
-        update: { password: a.password },
-        create: {
-          id: a.id, email: a.email, password: a.password,
-          createdAt: toDateOrNull(a.createdAt) || new Date(),
-        },
-      });
+      const exists = await run("adminUser", "findFirst", { where: { email: a.email } });
+      if (!exists) {
+        await run("adminUser", "create", {
+          data: {
+            id: a.id, email: a.email, password: a.password,
+            createdAt: toDateOrNull(a.createdAt) || new Date(),
+          },
+        });
+      }
     }
   }
 
   if (backup?.destinations) {
-    console.log(`📍 destinations (${backup.destinations.length})...`);
+    console.log(`📍 destinations (${backup.destinations.length}) — create-only...`);
     for (const d of backup.destinations) {
-      const data = {
-        name: d.name, tagline: d.tagline, description: d.description,
-        bestTime: d.bestTime, altitude: d.altitude, vibe: d.vibe, image: d.image,
-        highlights: d.highlights || [], categories: d.categories || [],
-        isActive: !!d.isActive, sortOrder: d.sortOrder ?? 0,
-        metaTitle: d.metaTitle, metaDescription: d.metaDescription, metaKeywords: d.metaKeywords,
-      };
-      await run("destination", "upsert", {
-        where: { slug: d.slug },
-        update: data,
-        create: {
-          id: d.id, slug: d.slug, ...data,
+      const exists = await run("destination", "findFirst", { where: { slug: d.slug } });
+      if (exists) continue;
+      await run("destination", "create", {
+        data: {
+          id: d.id, slug: d.slug,
+          name: d.name, tagline: d.tagline, description: d.description,
+          bestTime: d.bestTime, altitude: d.altitude, vibe: d.vibe, image: d.image,
+          highlights: d.highlights || [], categories: d.categories || [],
+          isActive: !!d.isActive, sortOrder: d.sortOrder ?? 0,
+          metaTitle: d.metaTitle, metaDescription: d.metaDescription, metaKeywords: d.metaKeywords,
           createdAt: toDateOrNull(d.createdAt) || new Date(),
           updatedAt: toDateOrNull(d.updatedAt) || new Date(),
         },
@@ -301,22 +300,20 @@ export async function seed() {
   }
 
   if (backup?.packages) {
-    console.log(`📦 packages (${backup.packages.length})...`);
+    console.log(`📦 packages (${backup.packages.length}) — create-only...`);
     for (const p of backup.packages) {
-      const data = {
-        title: p.title, location: p.location,
-        pricePerPerson: p.pricePerPerson, durationDays: p.durationDays, durationNights: p.durationNights,
-        imageUrls: p.imageUrls || [], vehicleType: p.vehicleType, maxOccupancy: p.maxOccupancy,
-        description: p.description, itinerary: p.itinerary || [],
-        inclusions: p.inclusions || [], exclusions: p.exclusions || [], categories: p.categories || [],
-        isFeatured: !!p.isFeatured, isActive: !!p.isActive, isTrek: !!p.isTrek,
-        metaTitle: p.metaTitle, metaDescription: p.metaDescription, metaKeywords: p.metaKeywords,
-      };
-      await run("package", "upsert", {
-        where: { slug: p.slug },
-        update: data,
-        create: {
-          id: p.id, slug: p.slug, ...data,
+      const exists = await run("package", "findFirst", { where: { slug: p.slug } });
+      if (exists) continue;
+      await run("package", "create", {
+        data: {
+          id: p.id, slug: p.slug,
+          title: p.title, location: p.location,
+          pricePerPerson: p.pricePerPerson, durationDays: p.durationDays, durationNights: p.durationNights,
+          imageUrls: p.imageUrls || [], vehicleType: p.vehicleType, maxOccupancy: p.maxOccupancy,
+          description: p.description, itinerary: p.itinerary || [],
+          inclusions: p.inclusions || [], exclusions: p.exclusions || [], categories: p.categories || [],
+          isFeatured: !!p.isFeatured, isActive: !!p.isActive, isTrek: !!p.isTrek,
+          metaTitle: p.metaTitle, metaDescription: p.metaDescription, metaKeywords: p.metaKeywords,
           createdAt: toDateOrNull(p.createdAt) || new Date(),
           updatedAt: toDateOrNull(p.updatedAt) || new Date(),
         },
@@ -324,14 +321,22 @@ export async function seed() {
     }
   }
 
-  console.log(`🥾 trek packages (${TREK_PACKAGES.length})...`);
+  console.log(`🥾 trek packages (${TREK_PACKAGES.length}) — create-only...`);
+  let createdTreks = 0;
   for (const t of TREK_PACKAGES) {
-    const data = { ...t, isFeatured: !!t.isFeatured, isActive: true, isTrek: true };
-    await run("package", "upsert", { where: { slug: t.slug }, update: data, create: data });
+    const existing = await run("package", "findFirst", { where: { slug: t.slug } });
+    if (!existing) {
+      const data = { ...t, isFeatured: !!t.isFeatured, isActive: true, isTrek: true };
+      await run("package", "create", { data });
+      createdTreks++;
+    }
   }
+  console.log(`   ${createdTreks} new, ${TREK_PACKAGES.length - createdTreks} preserved.`);
 
-  // Replace placeholder /images/destinations/*.png URLs that the legacy
-  // backup wrote into 5 packages with proper Himachal mountain photos.
+  // One-time image fix for legacy backup packages that had local
+  // /images/destinations/*.png paths. Only patches a row when its
+  // current image still looks like that placeholder — admin-uploaded
+  // images (any URL starting with http) are left alone.
   const BACKUP_IMAGE_OVERRIDES = {
     "manali-snow-retreat":      [IMGPOOL.beasValley, IMGPOOL.snowSki, IMGPOOL.snowyPeaks],
     "spiti-valley-expedition":  [IMGPOOL.spitiValley, IMGPOOL.monasteryTibet, IMGPOOL.coldDesert],
@@ -341,26 +346,28 @@ export async function seed() {
   };
   for (const [slug, imageUrls] of Object.entries(BACKUP_IMAGE_OVERRIDES)) {
     const exists = await run("package", "findFirst", { where: { slug } });
-    if (exists) {
+    if (!exists) continue;
+    const stillPlaceholder = (exists.imageUrls || []).some(
+      (u) => typeof u === "string" && u.startsWith("/images/")
+    );
+    if (stillPlaceholder) {
       await run("package", "update", { where: { slug }, data: { imageUrls } });
     }
   }
 
   if (backup?.blogs) {
-    console.log(`✍️  blogs (${backup.blogs.length})...`);
+    console.log(`✍️  blogs (${backup.blogs.length}) — create-only...`);
     for (const b of backup.blogs) {
-      const data = {
-        title: b.title, excerpt: b.excerpt, content: b.content, author: b.author,
-        coverImage: b.coverImage, category: b.category, tags: b.tags || [],
-        isPublished: !!b.isPublished,
-        publishedAt: toDateOrNull(b.publishedAt),
-        metaTitle: b.metaTitle, metaDescription: b.metaDescription, metaKeywords: b.metaKeywords,
-      };
-      await run("blog", "upsert", {
-        where: { slug: b.slug },
-        update: data,
-        create: {
-          id: b.id, slug: b.slug, ...data,
+      const exists = await run("blog", "findFirst", { where: { slug: b.slug } });
+      if (exists) continue;
+      await run("blog", "create", {
+        data: {
+          id: b.id, slug: b.slug,
+          title: b.title, excerpt: b.excerpt, content: b.content, author: b.author,
+          coverImage: b.coverImage, category: b.category, tags: b.tags || [],
+          isPublished: !!b.isPublished,
+          publishedAt: toDateOrNull(b.publishedAt),
+          metaTitle: b.metaTitle, metaDescription: b.metaDescription, metaKeywords: b.metaKeywords,
           createdAt: toDateOrNull(b.createdAt) || new Date(),
           updatedAt: toDateOrNull(b.updatedAt) || new Date(),
         },
@@ -374,14 +381,12 @@ export async function seed() {
       const existing = await run("testimonial", "findFirst", {
         where: { name: t.name, packageName: t.packageName },
       });
-      const data = {
-        name: t.name, text: t.text, packageName: t.packageName,
-        rating: t.rating, isActive: !!t.isActive,
-      };
-      if (existing) await run("testimonial", "update", { where: { id: existing.id }, data });
-      else await run("testimonial", "create", {
+      if (existing) continue;
+      await run("testimonial", "create", {
         data: {
-          id: t.id, ...data,
+          id: t.id,
+          name: t.name, text: t.text, packageName: t.packageName,
+          rating: t.rating, isActive: !!t.isActive,
           createdAt: toDateOrNull(t.createdAt) || new Date(),
           updatedAt: toDateOrNull(t.updatedAt) || new Date(),
         },
@@ -393,14 +398,12 @@ export async function seed() {
     console.log(`🧗 activities (${backup.activities.length})...`);
     for (const a of backup.activities) {
       const existing = await run("activity", "findFirst", { where: { title: a.title } });
-      const data = {
-        title: a.title, description: a.description, image: a.image, location: a.location,
-        icon: a.icon, isActive: !!a.isActive, sortOrder: a.sortOrder ?? 0,
-      };
-      if (existing) await run("activity", "update", { where: { id: existing.id }, data });
-      else await run("activity", "create", {
+      if (existing) continue;
+      await run("activity", "create", {
         data: {
-          id: a.id, ...data,
+          id: a.id,
+          title: a.title, description: a.description, image: a.image, location: a.location,
+          icon: a.icon, isActive: !!a.isActive, sortOrder: a.sortOrder ?? 0,
           createdAt: toDateOrNull(a.createdAt) || new Date(),
           updatedAt: toDateOrNull(a.updatedAt) || new Date(),
         },
@@ -412,14 +415,12 @@ export async function seed() {
     console.log(`🚗 cab vehicles (${backup.cab_vehicles.length})...`);
     for (const v of backup.cab_vehicles) {
       const existing = await run("cabVehicle", "findFirst", { where: { name: v.name } });
-      const data = {
-        name: v.name, model: v.model, capacity: v.capacity, ideal: v.ideal,
-        features: v.features || [], image: v.image, isActive: !!v.isActive,
-      };
-      if (existing) await run("cabVehicle", "update", { where: { id: existing.id }, data });
-      else await run("cabVehicle", "create", {
+      if (existing) continue;
+      await run("cabVehicle", "create", {
         data: {
-          id: v.id, ...data,
+          id: v.id,
+          name: v.name, model: v.model, capacity: v.capacity, ideal: v.ideal,
+          features: v.features || [], image: v.image, isActive: !!v.isActive,
           createdAt: toDateOrNull(v.createdAt) || new Date(),
           updatedAt: toDateOrNull(v.updatedAt) || new Date(),
         },
@@ -433,14 +434,12 @@ export async function seed() {
       const existing = await run("cabRoute", "findFirst", {
         where: { fromCity: r.fromCity, toCity: r.toCity },
       });
-      const data = {
-        fromCity: r.fromCity, toCity: r.toCity, price: r.price,
-        duration: r.duration, isActive: !!r.isActive,
-      };
-      if (existing) await run("cabRoute", "update", { where: { id: existing.id }, data });
-      else await run("cabRoute", "create", {
+      if (existing) continue;
+      await run("cabRoute", "create", {
         data: {
-          id: r.id, ...data,
+          id: r.id,
+          fromCity: r.fromCity, toCity: r.toCity, price: r.price,
+          duration: r.duration, isActive: !!r.isActive,
           createdAt: toDateOrNull(r.createdAt) || new Date(),
           updatedAt: toDateOrNull(r.updatedAt) || new Date(),
         },
@@ -449,13 +448,14 @@ export async function seed() {
   }
 
   if (backup?.site_settings) {
-    console.log(`⚙️  site settings (${backup.site_settings.length})...`);
+    console.log(`⚙️  site settings (${backup.site_settings.length}) — create-only...`);
     for (const s of backup.site_settings) {
-      await run("siteSetting", "upsert", {
-        where: { key: s.key },
-        update: { value: String(s.value) },
-        create: { id: s.id, key: s.key, value: String(s.value) },
-      });
+      const exists = await run("siteSetting", "findFirst", { where: { key: s.key } });
+      if (!exists) {
+        await run("siteSetting", "create", {
+          data: { id: s.id, key: s.key, value: String(s.value) },
+        });
+      }
     }
   }
 
@@ -483,47 +483,58 @@ export async function seed() {
 
   // Enrichment pass: layer Himachal-region content on top of the
   // backup-restored rows. Slugs match what's already indexed by search
-  // engines, so we overwrite content but never change the slug.
-  console.log(`🏔️  enriching ${ENRICHED_DESTINATIONS.length} destinations with Himachal content...`);
+  // engines, so we CREATE new rows when absent — but never overwrite
+  // an existing row (admin edits via /admin would be lost otherwise).
+  console.log(`🏔️  enriching ${ENRICHED_DESTINATIONS.length} destinations (create-only)...`);
+  let createdDests = 0;
   for (const d of ENRICHED_DESTINATIONS) {
-    await run("destination", "upsert", {
-      where: { slug: d.slug },
-      update: d,
-      create: d,
-    });
+    const existing = await run("destination", "findFirst", { where: { slug: d.slug } });
+    if (!existing) {
+      await run("destination", "create", { data: d });
+      createdDests++;
+    }
   }
+  console.log(`   ${createdDests} new, ${ENRICHED_DESTINATIONS.length - createdDests} preserved.`);
 
-  console.log(`🎒 seeding ${REGION_PACKAGES.length} region-anchored packages...`);
+  console.log(`🎒 seeding ${REGION_PACKAGES.length} region-anchored packages (create-only)...`);
+  let createdPkgs = 0;
   for (const p of REGION_PACKAGES) {
-    await run("package", "upsert", {
-      where: { slug: p.slug },
-      update: p,
-      create: p,
-    });
+    const existing = await run("package", "findFirst", { where: { slug: p.slug } });
+    if (!existing) {
+      await run("package", "create", { data: p });
+      createdPkgs++;
+    }
   }
+  console.log(`   ${createdPkgs} new, ${REGION_PACKAGES.length - createdPkgs} preserved.`);
 
-  console.log("📑 nav groups (package + trek types)...");
+  console.log("📑 nav groups (create-only)...");
   for (const g of PACKAGE_NAV_GROUPS) {
-    const data = { title: g.title, slug: g.slug, type: "package", sortOrder: g.sortOrder, tagline: g.tagline, isActive: true };
-    await run("internalPage", "upsert", { where: { slug: g.slug }, update: data, create: data });
+    const existing = await run("internalPage", "findFirst", { where: { slug: g.slug } });
+    if (!existing) {
+      await run("internalPage", "create", {
+        data: { title: g.title, slug: g.slug, type: "package", sortOrder: g.sortOrder, tagline: g.tagline, isActive: true },
+      });
+    }
   }
   for (const g of TREK_NAV_GROUPS) {
+    const existing = await run("internalPage", "findFirst", { where: { slug: g.slug } });
+    if (existing) {
+      console.log(`   • ${g.title} (preserved)`);
+      continue;
+    }
     const dests = [];
     for (const slug of g.destinationSlugs) {
       const d = await run("destination", "findFirst", { where: { slug } });
       if (d) dests.push(d);
     }
-
-    const baseData = {
-      title: g.title, slug: g.slug, type: "trek",
-      sortOrder: g.sortOrder, tagline: g.tagline, isActive: true,
-    };
-    await run("internalPage", "upsert", {
-      where: { slug: g.slug },
-      update: { ...baseData, destinations: { set: dests.map((d) => ({ id: d.id })) } },
-      create: { ...baseData, destinations: { connect: dests.map((d) => ({ id: d.id })) } },
+    await run("internalPage", "create", {
+      data: {
+        title: g.title, slug: g.slug, type: "trek",
+        sortOrder: g.sortOrder, tagline: g.tagline, isActive: true,
+        destinations: { connect: dests.map((d) => ({ id: d.id })) },
+      },
     });
-    console.log(`   • ${g.title} (${dests.length} dest)`);
+    console.log(`   • ${g.title} (${dests.length} dest, new)`);
   }
 
   console.log("✅ seed complete.");
