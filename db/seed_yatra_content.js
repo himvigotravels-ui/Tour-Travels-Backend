@@ -1,9 +1,9 @@
-// Seed FULL yatra content: 24 pilgrimage packages (isYatra=true) whose
-// slugs match the Yatras mega-menu items, plus enrich the matching
-// internal_pages nav-groups with description / tagline / cover image.
+// Seed the 24 yatra pilgrimage packages (isYatra=true) with full content:
+// itineraries, images, pricing, inclusions. These are the tour detail pages;
+// db/seed_yatras.js then groups them under the 5 dropdown categories.
 //
-// Re-runnable: packages & nav-groups are upserted (update if slug exists,
-// else create). Run from the backend/ directory:  node db/seed_yatra_content.js
+// Re-runnable: each package is upserted (update if slug exists, else create).
+// Run from the backend/ directory:  node db/seed_yatra_content.js
 //
 // It talks to whatever DB backend/src/db.js connects to (local dev.db, or
 // Turso in production when TURSO_DATABASE_URL is set).
@@ -574,33 +574,15 @@ async function upsertPackage(y) {
   return "created";
 }
 
-async function enrichNavGroup(y) {
-  const existing = await run("internalPage", "findFirst", { where: { slug: y.slug } });
-  if (!existing) return "missing";
-  await run("internalPage", "update", {
-    where: { slug: y.slug },
-    data: {
-      tagline: y.tagline,
-      description: `<p>${y.description}</p>`,
-      coverImage: y.images[0],
-      metaTitle: `${y.title} | Himvigo Yatras`,
-      metaDescription: y.description.slice(0, 155),
-    },
-  });
-  return "enriched";
-}
-
 async function main() {
-  console.log(`🛕 seeding ${YATRAS.length} yatra packages + enriching nav groups...`);
-  let created = 0, updated = 0, enriched = 0, missing = 0;
+  console.log(`🛕 seeding ${YATRAS.length} yatra packages...`);
+  let created = 0, updated = 0;
   for (const y of YATRAS) {
     const p = await upsertPackage(y);
     p === "created" ? created++ : updated++;
-    const n = await enrichNavGroup(y);
-    n === "enriched" ? enriched++ : missing++;
-    console.log(`  • ${y.title.padEnd(48)} pkg:${p}  nav:${n}`);
+    console.log(`  • ${y.title.padEnd(48)} pkg:${p}`);
   }
-  console.log(`\n✅ done — packages: ${created} new / ${updated} updated · nav groups enriched: ${enriched}${missing ? ` · missing: ${missing}` : ""}`);
+  console.log(`\n✅ done — packages: ${created} new / ${updated} updated.`);
 }
 
 main().catch((e) => {
