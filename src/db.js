@@ -35,6 +35,33 @@ const statements = cleaned
   .map((s) => s.trim())
   .filter(Boolean);
 
+// ─── Lightweight, idempotent column migrations ─────────────────────────
+// schema.sql uses CREATE TABLE IF NOT EXISTS, so new columns added to an
+// existing table are never applied to a pre-existing dev.db / Turso DB.
+// These run BEFORE schema apply so that any new index in schema.sql that
+// references a freshly-added column can be created without erroring.
+// Tables that don't exist yet are skipped — the fresh CREATE TABLE below
+// already includes the column.
+const COLUMN_MIGRATIONS = [
+  ["packages", "isYatra", "INTEGER NOT NULL DEFAULT 0"],
+  ["internal_pages", "menuCategory", "TEXT"],
+];
+for (const [table, column, definition] of COLUMN_MIGRATIONS) {
+  try {
+    const info = await client.execute(`PRAGMA table_info(${table})`);
+    if (info.rows.length === 0) continue; // table not created yet → fresh DB
+    const exists = info.rows.some((r) => r.name === column);
+    if (!exists) {
+      await client.execute(
+        `ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`
+      );
+      console.log(`🛠️  migration: added ${table}.${column}`);
+    }
+  } catch (e) {
+    console.error(`⚠️  migration failed for ${table}.${column}:`, e.message);
+  }
+}
+
 for (const stmt of statements) {
   await client.execute(stmt);
 }

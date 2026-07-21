@@ -6,7 +6,7 @@ export const MODELS = {
   package: {
     table: "packages",
     json: ["imageUrls", "itinerary", "inclusions", "exclusions", "categories"],
-    bool: ["isFeatured", "isActive", "isTrek"],
+    bool: ["isFeatured", "isActive", "isTrek", "isYatra"],
     unique: ["id", "slug"],
     relations: {
       internalPages: {

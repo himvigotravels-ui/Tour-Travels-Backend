@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS packages (
   isFeatured      INTEGER NOT NULL DEFAULT 0,
   isActive        INTEGER NOT NULL DEFAULT 1,
   isTrek          INTEGER NOT NULL DEFAULT 0,
+  isYatra         INTEGER NOT NULL DEFAULT 0,
   metaTitle       TEXT,
   metaDescription TEXT,
   metaKeywords    TEXT,
@@ -161,6 +162,7 @@ CREATE TABLE IF NOT EXISTS internal_pages (
   content         TEXT,
   coverImage      TEXT,
   type            TEXT NOT NULL,
+  menuCategory    TEXT,
   isActive        INTEGER NOT NULL DEFAULT 1,
   isFeatured      INTEGER NOT NULL DEFAULT 0,
   sortOrder       INTEGER NOT NULL DEFAULT 0,
@@ -192,6 +194,7 @@ CREATE TABLE IF NOT EXISTS internal_page_destinations (
 CREATE INDEX IF NOT EXISTS idx_packages_active        ON packages (isActive);
 CREATE INDEX IF NOT EXISTS idx_packages_featured      ON packages (isFeatured);
 CREATE INDEX IF NOT EXISTS idx_packages_istrek        ON packages (isTrek);
+CREATE INDEX IF NOT EXISTS idx_packages_isyatra       ON packages (isYatra);
 CREATE INDEX IF NOT EXISTS idx_blogs_published        ON blogs (isPublished);
 CREATE INDEX IF NOT EXISTS idx_destinations_active    ON destinations (isActive);
 CREATE INDEX IF NOT EXISTS idx_internal_pages_active  ON internal_pages (isActive);
