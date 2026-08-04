@@ -174,6 +174,31 @@ CREATE TABLE IF NOT EXISTS internal_pages (
   updatedAt       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
 );
 
+CREATE TABLE IF NOT EXISTS upcoming_trips (
+  id              TEXT PRIMARY KEY,
+  slug            TEXT NOT NULL UNIQUE,
+  title           TEXT NOT NULL,
+  destination     TEXT NOT NULL,
+  startDate       TEXT,
+  endDate         TEXT,
+  durationDays    INTEGER NOT NULL DEFAULT 1,
+  durationNights  INTEGER NOT NULL DEFAULT 0,
+  pricePerPerson  INTEGER NOT NULL DEFAULT 0,
+  image           TEXT,
+  totalSeats      INTEGER NOT NULL DEFAULT 0,
+  seatsLeft       INTEGER NOT NULL DEFAULT 0,
+  description     TEXT,
+  highlights      TEXT NOT NULL DEFAULT '[]',
+  isActive        INTEGER NOT NULL DEFAULT 1,
+  isFeatured      INTEGER NOT NULL DEFAULT 0,
+  sortOrder       INTEGER NOT NULL DEFAULT 0,
+  metaTitle       TEXT,
+  metaDescription TEXT,
+  metaKeywords    TEXT,
+  createdAt       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  updatedAt       TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
+
 -- Many-to-many join tables (explicit, plain naming)
 CREATE TABLE IF NOT EXISTS internal_page_packages (
   internalPageId TEXT NOT NULL,
@@ -199,3 +224,5 @@ CREATE INDEX IF NOT EXISTS idx_blogs_published        ON blogs (isPublished);
 CREATE INDEX IF NOT EXISTS idx_destinations_active    ON destinations (isActive);
 CREATE INDEX IF NOT EXISTS idx_internal_pages_active  ON internal_pages (isActive);
 CREATE INDEX IF NOT EXISTS idx_internal_pages_type    ON internal_pages (type);
+CREATE INDEX IF NOT EXISTS idx_upcoming_active        ON upcoming_trips (isActive);
+CREATE INDEX IF NOT EXISTS idx_upcoming_start         ON upcoming_trips (startDate);

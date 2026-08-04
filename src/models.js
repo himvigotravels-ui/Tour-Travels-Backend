@@ -91,6 +91,13 @@ export const MODELS = {
     unique: ["id", "email"],
     relations: {},
   },
+  upcomingTrip: {
+    table: "upcoming_trips",
+    json: ["highlights"],
+    bool: ["isActive", "isFeatured"],
+    unique: ["id", "slug"],
+    relations: {},
+  },
   internalPage: {
     table: "internal_pages",
     json: [],
